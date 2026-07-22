@@ -12,7 +12,7 @@ export default function LoginPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4">
       <div>
-        <h1 className="text-2xl font-semibold">Sous</h1>
+        <h1 className="text-2xl font-semibold">Seasoned</h1>
         <p className="text-sm text-neutral-500">
           Your personal chef instructor. Sign in with your email — no password
           needed.

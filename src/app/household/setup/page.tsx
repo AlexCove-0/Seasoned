@@ -16,7 +16,7 @@ export default async function HouseholdSetupPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-8 px-4">
       <div>
-        <h1 className="text-2xl font-semibold">Set up your kitchen</h1>
+        <h1 className="text-2xl font-semibold">Let&apos;s get to know you</h1>
         <p className="text-sm text-neutral-500">
           Create a household to start saving recipes, or join one you&apos;ve been
           invited to.
