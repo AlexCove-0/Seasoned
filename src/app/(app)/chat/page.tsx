@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
+import { COMMON_INGREDIENTS } from "@/lib/taste-options";
 import { ChatClient } from "./chat-client";
 
 export default async function ChatPage() {
@@ -34,9 +35,20 @@ export default async function ChatPage() {
     .eq("id", household.id)
     .single<{ pantry_staples: string[] }>();
 
-  const ingredientSuggestions = [
-    ...new Set([...(householdRow?.pantry_staples ?? []), ...(topIngredients ?? []).map((i) => i.name)]),
-  ];
+  // Case-insensitive dedup, keeping whichever casing is seen first -- pantry
+  // staples and the common list are properly cased, so they win over
+  // however someone happened to type something into "ingredients on hand"
+  // in the past.
+  const seen = new Map<string, string>();
+  for (const name of [
+    ...(householdRow?.pantry_staples ?? []),
+    ...COMMON_INGREDIENTS,
+    ...(topIngredients ?? []).map((i) => i.name),
+  ]) {
+    const key = name.toLowerCase();
+    if (!seen.has(key)) seen.set(key, name);
+  }
+  const ingredientSuggestions = [...seen.values()];
 
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col px-4 py-6">

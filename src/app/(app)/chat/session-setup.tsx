@@ -17,10 +17,12 @@ export function SessionSetup({
   members,
   topIngredients,
   onStart,
+  starting,
 }: {
   members: Member[];
   topIngredients: string[];
   onStart: (config: SessionConfig) => void;
+  starting?: boolean;
 }) {
   const favorites = members.filter((m) => m.is_favorite);
   const rest = members.filter((m) => !m.is_favorite);
@@ -39,6 +41,15 @@ export function SessionSetup({
 
   return (
     <div className="flex flex-1 flex-col gap-6">
+      <div className="max-w-sm">
+        <TagPicker
+          label="Ingredients on hand"
+          suggestions={topIngredients}
+          placeholder="Type an ingredient and press Enter..."
+          onChange={setIngredientsOnHand}
+        />
+      </div>
+
       {members.length > 0 ? (
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium">Cooking for</span>
@@ -74,37 +85,34 @@ export function SessionSetup({
         </div>
       ) : null}
 
-      <label className="flex max-w-[10rem] flex-col gap-1 text-sm">
+      <label className="flex w-20 flex-col gap-1 text-sm">
         <span className="font-medium">Portions</span>
         <input
           type="number"
           min={1}
+          max={99}
           value={servings}
           onChange={(e) => setServings(Math.max(1, Number(e.target.value) || 1))}
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"
+          className="rounded-md border border-neutral-300 px-2 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"
         />
       </label>
 
-      <TagPicker
-        label="Regional twist (optional — leave blank for no particular style)"
-        suggestions={REGIONAL_CUISINES}
-        placeholder="e.g. Mexican, Chinese, Mediterranean..."
-        onChange={setRegionalTwist}
-      />
-
-      <TagPicker
-        label="Ingredients on hand"
-        suggestions={topIngredients}
-        placeholder="Type an ingredient and press Enter..."
-        onChange={setIngredientsOnHand}
-      />
+      <div className="max-w-sm">
+        <TagPicker
+          label="Regional twist (optional)"
+          suggestions={REGIONAL_CUISINES}
+          placeholder="e.g. Mexican, Chinese..."
+          onChange={setRegionalTwist}
+        />
+      </div>
 
       <button
         type="button"
         onClick={() => onStart({ dinerIds, servings, regionalTwist, ingredientsOnHand })}
-        className="self-start rounded-md bg-accent-600 px-4 py-2 text-sm font-medium text-white dark:bg-accent-400 dark:text-white"
+        disabled={starting}
+        className="self-start rounded-md bg-accent-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white"
       >
-        Start cooking
+        {starting ? "Thinking..." : "Find recipe ideas"}
       </button>
     </div>
   );

@@ -53,3 +53,55 @@ export const PROPOSE_RECIPE_TOOL: Anthropic.Tool = {
     required: ["title", "base_servings", "ingredients", "steps"],
   },
 };
+
+export const SUGGEST_EXTRA_INGREDIENTS_TOOL: Anthropic.Tool = {
+  name: "suggest_extra_ingredients",
+  description:
+    "Suggest a short list of additional ingredients (not already on hand) that would open up good recipe directions.",
+  input_schema: {
+    type: "object",
+    properties: {
+      extra_ingredients: {
+        type: "array",
+        items: { type: "string" },
+        description:
+          "5-8 common, easy-to-have ingredients -- not already on hand -- that would meaningfully expand what's possible to cook.",
+      },
+    },
+    required: ["extra_ingredients"],
+  },
+};
+
+export type RecipeOption = { title: string; pitch: string; style: string | null };
+
+export const SUGGEST_RECIPE_OPTIONS_TOOL: Anthropic.Tool = {
+  name: "suggest_recipe_options",
+  description: "Propose exactly 3 distinct recipe directions given the ingredients and context.",
+  input_schema: {
+    type: "object",
+    properties: {
+      options: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            pitch: {
+              type: "string",
+              description: "1-2 sentences selling why this direction is a good pick right now.",
+            },
+            style: {
+              type: ["string", "null"],
+              description:
+                "Short cuisine/style tag, e.g. 'Mexican-inspired', 'Classic comfort'. Null if none fits.",
+            },
+          },
+          required: ["title", "pitch", "style"],
+        },
+        minItems: 3,
+        maxItems: 3,
+      },
+    },
+    required: ["options"],
+  },
+};
