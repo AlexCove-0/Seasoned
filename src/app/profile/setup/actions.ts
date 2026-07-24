@@ -10,7 +10,7 @@ export async function saveProfile(_prevState: State, formData: FormData): Promis
   if (!displayName) return { error: "Enter your name." };
 
   const tastePreferences = formData.getAll("tastePreferences").map(String);
-  const regionalTastes = formData.getAll("regionalTastes").map(String);
+  const dislikedTastes = formData.getAll("dislikedTastes").map(String);
   const allergies = formData.getAll("allergies").map(String);
 
   const supabase = await createClient();
@@ -24,7 +24,7 @@ export async function saveProfile(_prevState: State, formData: FormData): Promis
     .update({
       display_name: displayName,
       taste_preferences: tastePreferences,
-      regional_tastes: regionalTastes,
+      disliked_tastes: dislikedTastes,
       allergies,
     })
     .eq("user_id", user.id);

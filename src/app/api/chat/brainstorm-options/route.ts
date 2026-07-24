@@ -31,18 +31,18 @@ export async function POST(request: Request) {
   let diners: {
     display_name: string;
     taste_preferences: string[];
-    regional_tastes: string[];
+    disliked_tastes: string[];
     allergies: string[];
   }[] = [];
 
   if (Array.isArray(body.dinerIds) && body.dinerIds.length > 0) {
     const { data } = await supabase
       .from("household_members")
-      .select("display_name, taste_preferences, regional_tastes, allergies")
+      .select("display_name, taste_preferences, disliked_tastes, allergies")
       .eq("household_id", household.id)
       .in("id", body.dinerIds)
       .returns<
-        { display_name: string; taste_preferences: string[]; regional_tastes: string[]; allergies: string[] }[]
+        { display_name: string; taste_preferences: string[]; disliked_tastes: string[]; allergies: string[] }[]
       >();
     diners = data ?? [];
   }

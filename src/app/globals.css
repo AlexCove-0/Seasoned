@@ -50,3 +50,9 @@ body {
   color: var(--foreground);
   font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
 }
+
+/* Tailwind's preflight resets buttons to cursor: default; every clickable
+   button in the app should look clickable. */
+button:not(:disabled) {
+  cursor: pointer;
+}

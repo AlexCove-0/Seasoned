@@ -1,7 +1,7 @@
 type Diner = {
   display_name: string;
   taste_preferences: string[];
-  regional_tastes: string[];
+  disliked_tastes: string[];
   allergies: string[];
 };
 
@@ -54,6 +54,7 @@ export function buildDinerContext({
     for (const d of diners) {
       const parts: string[] = [];
       if (d.taste_preferences.length > 0) parts.push(`likes ${d.taste_preferences.join(", ")}`);
+      if (d.disliked_tastes.length > 0) parts.push(`dislikes ${d.disliked_tastes.join(", ")}`);
       if (d.allergies.length > 0) parts.push(`ALLERGIC TO: ${d.allergies.join(", ")}`);
       lines.push(`- ${d.display_name}${parts.length > 0 ? ` — ${parts.join("; ")}` : " — no preferences set"}`);
     }

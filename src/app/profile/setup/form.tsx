@@ -2,7 +2,8 @@
 
 import { useActionState } from "react";
 import { TagPicker } from "@/components/tag-picker";
-import { TASTE_PREFERENCES, COMMON_ALLERGENS, REGIONAL_CUISINES } from "@/lib/taste-options";
+import { TastePicker } from "@/components/taste-picker";
+import { TASTE_PREFERENCES, COMMON_ALLERGENS } from "@/lib/taste-options";
 import { saveProfile } from "./actions";
 
 const inputClass =
@@ -13,12 +14,12 @@ const buttonClass =
 export function ProfileSetupForm({
   defaultDisplayName,
   defaultTastePreferences = [],
-  defaultRegionalTastes = [],
+  defaultDislikedTastes = [],
   defaultAllergies = [],
 }: {
   defaultDisplayName: string;
   defaultTastePreferences?: string[];
-  defaultRegionalTastes?: string[];
+  defaultDislikedTastes?: string[];
   defaultAllergies?: string[];
 }) {
   const [state, formAction, pending] = useActionState(saveProfile, { error: null });
@@ -35,20 +36,13 @@ export function ProfileSetupForm({
         />
       </label>
 
-      <TagPicker
-        name="tastePreferences"
+      <TastePicker
+        likedName="tastePreferences"
+        dislikedName="dislikedTastes"
         label="Taste preferences"
         suggestions={TASTE_PREFERENCES}
-        defaultValue={defaultTastePreferences}
-        placeholder="Search flavors or add your own..."
-      />
-
-      <TagPicker
-        name="regionalTastes"
-        label="Regional tastes"
-        suggestions={REGIONAL_CUISINES}
-        defaultValue={defaultRegionalTastes}
-        placeholder="e.g. Ecuadorian, Mediterranean..."
+        defaultLiked={defaultTastePreferences}
+        defaultDisliked={defaultDislikedTastes}
       />
 
       <TagPicker

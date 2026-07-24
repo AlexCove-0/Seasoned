@@ -2,7 +2,8 @@
 
 import { useActionState, useEffect, useState, useTransition } from "react";
 import { TagPicker } from "@/components/tag-picker";
-import { TASTE_PREFERENCES, COMMON_ALLERGENS, REGIONAL_CUISINES } from "@/lib/taste-options";
+import { TastePicker } from "@/components/taste-picker";
+import { TASTE_PREFERENCES, COMMON_ALLERGENS } from "@/lib/taste-options";
 import { updatePerson, toggleFavorite } from "./profile-actions";
 import type { Member } from "./page";
 
@@ -11,14 +12,18 @@ const inputClass =
 const buttonClass =
   "rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white";
 
-function ChipRow({ tags }: { tags: string[] }) {
+function ChipRow({ tags, dim = false }: { tags: string[]; dim?: boolean }) {
   if (tags.length === 0) return <span className="text-neutral-400">None set</span>;
   return (
     <span className="flex flex-wrap gap-1">
       {tags.map((t) => (
         <span
           key={t}
-          className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs dark:bg-neutral-800"
+          className={
+            dim
+              ? "rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500 line-through dark:bg-neutral-800"
+              : "rounded-full bg-neutral-100 px-2 py-0.5 text-xs dark:bg-neutral-800"
+          }
         >
           {t}
         </span>
@@ -61,22 +66,22 @@ export function PersonCard({ member }: { member: Member }) {
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="text-xs text-neutral-500 underline"
+            className="text-xs text-neutral-500 underline hover:text-neutral-900 dark:hover:text-white"
           >
             Edit
           </button>
         </div>
         <dl className="flex flex-col gap-1.5">
           <div className="flex gap-2">
-            <dt className="w-24 shrink-0 text-neutral-500">Tastes</dt>
+            <dt className="w-24 shrink-0 text-neutral-500">Likes</dt>
             <dd>
               <ChipRow tags={member.taste_preferences} />
             </dd>
           </div>
           <div className="flex gap-2">
-            <dt className="w-24 shrink-0 text-neutral-500">Regional</dt>
+            <dt className="w-24 shrink-0 text-neutral-500">Dislikes</dt>
             <dd>
-              <ChipRow tags={member.regional_tastes} />
+              <ChipRow tags={member.disliked_tastes} dim />
             </dd>
           </div>
           <div className="flex gap-2">
@@ -104,17 +109,13 @@ export function PersonCard({ member }: { member: Member }) {
         <input type="checkbox" name="isFavorite" defaultChecked={member.is_favorite} className="h-4 w-4" />
         Favorite — show by default when picking who you&apos;re cooking for
       </label>
-      <TagPicker
-        name="tastePreferences"
+      <TastePicker
+        likedName="tastePreferences"
+        dislikedName="dislikedTastes"
         label="Taste preferences"
         suggestions={TASTE_PREFERENCES}
-        defaultValue={member.taste_preferences}
-      />
-      <TagPicker
-        name="regionalTastes"
-        label="Regional tastes"
-        suggestions={REGIONAL_CUISINES}
-        defaultValue={member.regional_tastes}
+        defaultLiked={member.taste_preferences}
+        defaultDisliked={member.disliked_tastes}
       />
       <TagPicker
         name="allergies"

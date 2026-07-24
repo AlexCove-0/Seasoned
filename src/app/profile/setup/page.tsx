@@ -5,7 +5,7 @@ import { ProfileSetupForm } from "./form";
 type ExistingProfile = {
   display_name: string;
   taste_preferences: string[];
-  regional_tastes: string[];
+  disliked_tastes: string[];
   allergies: string[];
 };
 
@@ -18,7 +18,7 @@ export default async function ProfileSetupPage() {
 
   const { data: member } = await supabase
     .from("household_members")
-    .select("display_name, taste_preferences, regional_tastes, allergies")
+    .select("display_name, taste_preferences, disliked_tastes, allergies")
     .eq("user_id", user.id)
     .maybeSingle<ExistingProfile>();
 
@@ -36,7 +36,7 @@ export default async function ProfileSetupPage() {
       <ProfileSetupForm
         defaultDisplayName={member.display_name}
         defaultTastePreferences={member.taste_preferences}
-        defaultRegionalTastes={member.regional_tastes}
+        defaultDislikedTastes={member.disliked_tastes}
         defaultAllergies={member.allergies}
       />
     </main>

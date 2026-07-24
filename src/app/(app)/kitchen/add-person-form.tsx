@@ -2,7 +2,8 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { TagPicker } from "@/components/tag-picker";
-import { TASTE_PREFERENCES, COMMON_ALLERGENS, REGIONAL_CUISINES } from "@/lib/taste-options";
+import { TastePicker } from "@/components/taste-picker";
+import { TASTE_PREFERENCES, COMMON_ALLERGENS } from "@/lib/taste-options";
 import { addPerson } from "./profile-actions";
 
 const inputClass =
@@ -58,8 +59,12 @@ export function AddPersonForm() {
         <input type="checkbox" name="isFavorite" defaultChecked className="h-4 w-4" />
         Favorite — show by default when picking who you&apos;re cooking for
       </label>
-      <TagPicker name="tastePreferences" label="Taste preferences" suggestions={TASTE_PREFERENCES} />
-      <TagPicker name="regionalTastes" label="Regional tastes" suggestions={REGIONAL_CUISINES} />
+      <TastePicker
+        likedName="tastePreferences"
+        dislikedName="dislikedTastes"
+        label="Taste preferences"
+        suggestions={TASTE_PREFERENCES}
+      />
       <TagPicker name="allergies" label="Food allergies" suggestions={COMMON_ALLERGENS} />
       <div className="flex gap-2">
         <button

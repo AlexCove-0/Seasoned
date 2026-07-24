@@ -13,7 +13,7 @@ export type Member = {
   user_id: string | null;
   display_name: string;
   taste_preferences: string[];
-  regional_tastes: string[];
+  disliked_tastes: string[];
   allergies: string[];
   is_favorite: boolean;
 };
@@ -30,7 +30,7 @@ export default async function KitchenPage() {
 
   const { data: members } = await supabase
     .from("household_members")
-    .select("id, user_id, display_name, taste_preferences, regional_tastes, allergies, is_favorite")
+    .select("id, user_id, display_name, taste_preferences, disliked_tastes, allergies, is_favorite")
     .eq("household_id", household.id)
     .order("created_at", { ascending: true })
     .returns<Member[]>();

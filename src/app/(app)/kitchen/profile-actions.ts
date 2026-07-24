@@ -14,7 +14,7 @@ export async function addPerson(_prevState: State, formData: FormData): Promise<
   if (!household) return { error: "No household found." };
 
   const tastePreferences = formData.getAll("tastePreferences").map(String);
-  const regionalTastes = formData.getAll("regionalTastes").map(String);
+  const dislikedTastes = formData.getAll("dislikedTastes").map(String);
   const allergies = formData.getAll("allergies").map(String);
   const isFavorite = formData.get("isFavorite") === "on";
 
@@ -24,7 +24,7 @@ export async function addPerson(_prevState: State, formData: FormData): Promise<
     user_id: null,
     display_name: displayName,
     taste_preferences: tastePreferences,
-    regional_tastes: regionalTastes,
+    disliked_tastes: dislikedTastes,
     allergies,
     is_favorite: isFavorite,
   });
@@ -41,7 +41,7 @@ export async function updatePerson(_prevState: State, formData: FormData): Promi
   if (!memberId || !displayName) return { error: "Enter a name." };
 
   const tastePreferences = formData.getAll("tastePreferences").map(String);
-  const regionalTastes = formData.getAll("regionalTastes").map(String);
+  const dislikedTastes = formData.getAll("dislikedTastes").map(String);
   const allergies = formData.getAll("allergies").map(String);
   const isFavorite = formData.get("isFavorite") === "on";
 
@@ -51,7 +51,7 @@ export async function updatePerson(_prevState: State, formData: FormData): Promi
     .update({
       display_name: displayName,
       taste_preferences: tastePreferences,
-      regional_tastes: regionalTastes,
+      disliked_tastes: dislikedTastes,
       allergies,
       is_favorite: isFavorite,
     })
