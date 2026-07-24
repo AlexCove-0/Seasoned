@@ -37,11 +37,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
           fresh invite.
         </p>
       ) : (
-        <QuestionnaireForm
-          token={token}
-          displayName={target.display_name}
-          householdName={target.household_name}
-        />
+        <QuestionnaireForm token={token} displayName={target.display_name} />
       )}
     </main>
   );

@@ -16,11 +16,9 @@ const HIGHLIGHTS = [
 export function QuestionnaireForm({
   token,
   displayName,
-  householdName,
 }: {
   token: string;
   displayName: string;
-  householdName: string;
 }) {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +30,7 @@ export function QuestionnaireForm({
         <p>Thanks, {displayName}! Your taste profile is saved.</p>
 
         <div className="flex flex-col gap-2">
-          <p className="font-medium">Here&apos;s what you&apos;ll get by joining {householdName} on Seasoned:</p>
+          <p className="font-medium">Sharpen your skills in the kitchen with Seasoned:</p>
           <ul className="flex flex-col gap-1.5 text-neutral-600 dark:text-neutral-400">
             {HIGHLIGHTS.map((h) => (
               <li key={h} className="flex gap-2">
