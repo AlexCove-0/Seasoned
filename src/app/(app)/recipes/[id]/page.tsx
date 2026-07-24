@@ -5,6 +5,7 @@ import { getCurrentHousehold } from "@/lib/household";
 import type { CookLog, Recipe, RecipeRating } from "@/lib/types";
 import { CookLogForm } from "./cook-log-form";
 import { RecipeIngredients } from "./recipe-ingredients";
+import { RecipeSteps } from "./recipe-steps";
 import { RecipeRatings } from "./recipe-ratings";
 import { RecipeShare } from "./recipe-share";
 
@@ -104,21 +105,7 @@ export default async function RecipePage({
 
       <RecipeIngredients ingredients={recipe.ingredients} baseServings={recipe.base_servings} />
 
-      <section>
-        <h2 className="mb-2 text-lg font-medium">Steps</h2>
-        <ol className="flex flex-col gap-4">
-          {recipe.steps.map((step, i) => (
-            <li key={i} className="flex flex-col gap-1">
-              <p className="text-sm">
-                <span className="font-medium">{i + 1}.</span> {step.instruction}
-              </p>
-              {step.technique_note ? (
-                <p className="ml-4 text-sm text-neutral-500">{step.technique_note}</p>
-              ) : null}
-            </li>
-          ))}
-        </ol>
-      </section>
+      <RecipeSteps recipeId={recipe.id} steps={recipe.steps} />
 
       <RecipeRatings
         recipeId={recipe.id}

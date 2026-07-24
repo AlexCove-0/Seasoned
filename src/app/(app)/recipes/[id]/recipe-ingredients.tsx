@@ -28,9 +28,9 @@ export function RecipeIngredients({
   }
 
   return (
-    <section>
-      <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-lg font-medium">Ingredients</h2>
+    <section className="rounded-2xl bg-neutral-100 p-5 dark:bg-neutral-900">
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-accent-600 dark:text-accent-400">Ingredients</h2>
         <div className="flex items-center gap-2 text-sm">
           <button
             type="button"
@@ -55,9 +55,12 @@ export function RecipeIngredients({
         </div>
       </div>
 
-      <ul className="flex flex-col gap-1 text-sm">
+      <ul className="flex flex-col gap-1.5 text-sm">
         {scaled.map((line, i) => (
-          <li key={i}>{line}</li>
+          <li key={i} className="flex gap-2">
+            <span className="text-accent-600 dark:text-accent-400">&bull;</span>
+            <span>{line}</span>
+          </li>
         ))}
       </ul>
 
@@ -65,7 +68,7 @@ export function RecipeIngredients({
         type="button"
         onClick={handleAddToShoppingList}
         disabled={pending}
-        className="mt-3 rounded-md border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-600 disabled:opacity-50 dark:border-neutral-700 dark:text-neutral-400"
+        className="mt-4 rounded-md border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-600 disabled:opacity-50 dark:border-neutral-700 dark:text-neutral-400"
       >
         {pending ? "Adding..." : added ? "Added to shopping list ✓" : "Add to shopping list"}
       </button>
