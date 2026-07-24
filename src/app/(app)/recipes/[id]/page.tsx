@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { CookLog, Recipe } from "@/lib/types";
 import { CookLogForm } from "./cook-log-form";
+import { RecipeIngredients } from "./recipe-ingredients";
 
 export default async function RecipePage({
   params,
@@ -48,18 +49,7 @@ export default async function RecipePage({
         Start cooking
       </Link>
 
-      <section>
-        <h2 className="mb-2 text-lg font-medium">Ingredients</h2>
-        <ul className="flex flex-col gap-1 text-sm">
-          {recipe.ingredients.map((ing, i) => (
-            <li key={i}>
-              {ing.quantity ? `${ing.quantity} ` : ""}
-              {ing.unit ? `${ing.unit} ` : ""}
-              {ing.name}
-            </li>
-          ))}
-        </ul>
-      </section>
+      <RecipeIngredients ingredients={recipe.ingredients} baseServings={recipe.base_servings} />
 
       <section>
         <h2 className="mb-2 text-lg font-medium">Steps</h2>

@@ -2,8 +2,32 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentHousehold } from "@/lib/household";
 
 type State = { error: string | null };
+
+export async function addToShoppingList(items: string[]) {
+  if (items.length === 0) return;
+
+  const household = await getCurrentHousehold();
+  if (!household) return;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  await supabase.from("shopping_list_items").insert(
+    items.map((name) => ({
+      household_id: household.id,
+      name,
+      added_by: user.id,
+    })),
+  );
+
+  revalidatePath("/shopping-list");
+}
 
 export async function logCook(
   recipeId: string,

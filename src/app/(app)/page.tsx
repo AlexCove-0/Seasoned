@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
+import { RecipeList } from "./recipe-list";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -43,19 +44,7 @@ export default async function Home() {
             Nothing saved yet — start a conversation above.
           </p>
         ) : (
-          <ul className="flex flex-col gap-2">
-            {recipes.map((r) => (
-              <li key={r.id}>
-                <Link
-                  href={`/recipes/${r.id}`}
-                  className="flex items-center justify-between rounded-lg border border-neutral-200 p-3 text-sm hover:border-neutral-400 dark:border-neutral-800 dark:hover:border-neutral-600"
-                >
-                  <span>{r.title}</span>
-                  <span className="text-neutral-500">Serves {r.base_servings}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <RecipeList recipes={recipes} />
         )}
       </section>
     </main>
