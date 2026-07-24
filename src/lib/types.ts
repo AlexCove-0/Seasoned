@@ -18,3 +18,12 @@ export type CookLog = {
   rating: number | null;
   notes: string | null;
 };
+
+export type RecipeRating = {
+  id: string;
+  member_id: string;
+  member_name: string;
+  rating: number;
+  comment: string | null;
+  updated_at: string;
+};

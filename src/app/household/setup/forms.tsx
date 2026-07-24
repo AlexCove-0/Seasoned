@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState, useState } from "react";
-import { createHousehold, joinHousehold } from "./actions";
+import { useActionState, useState, useTransition } from "react";
+import { createHousehold, joinHousehold, lookupUnclaimedProfiles, claimProfile } from "./actions";
+import type { UnclaimedProfile } from "./actions";
 
 const inputClass =
   "rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900";
@@ -15,9 +16,6 @@ export function HouseholdSetupForms() {
     createHousehold,
     { error: null },
   );
-  const [joinState, joinAction, joinPending] = useActionState(joinHousehold, {
-    error: null,
-  });
 
   return (
     <div className="flex flex-col gap-6">
@@ -62,28 +60,111 @@ export function HouseholdSetupForms() {
           ) : null}
         </form>
       ) : (
-        <form action={joinAction} className="flex flex-col gap-3">
-          <label className="flex flex-col gap-1 text-sm">
-            Invite code
-            <input
-              name="inviteCode"
-              required
-              placeholder="ABC123"
-              className={`${inputClass} uppercase`}
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm">
-            Your name
-            <input name="displayName" required placeholder="Alex" className={inputClass} />
-          </label>
-          <button type="submit" disabled={joinPending} className={buttonClass}>
-            {joinPending ? "Joining..." : "Join household"}
-          </button>
-          {joinState.error ? (
-            <p className="text-sm text-red-600">{joinState.error}</p>
-          ) : null}
-        </form>
+        <JoinHouseholdForm />
       )}
     </div>
+  );
+}
+
+function JoinHouseholdForm() {
+  const [inviteCode, setInviteCode] = useState("");
+  const [checked, setChecked] = useState(false);
+  const [profiles, setProfiles] = useState<UnclaimedProfile[]>([]);
+  const [claimingAsNew, setClaimingAsNew] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  const [joinState, joinAction, joinPending] = useActionState(joinHousehold, { error: null });
+
+  function handleCheck() {
+    if (!inviteCode.trim()) return;
+    setError(null);
+    startTransition(async () => {
+      const result = await lookupUnclaimedProfiles(inviteCode);
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+      setProfiles(result.profiles);
+      setChecked(true);
+    });
+  }
+
+  function handleClaim(memberId: string) {
+    setError(null);
+    startTransition(async () => {
+      const result = await claimProfile(inviteCode, memberId);
+      if (result?.error) setError(result.error);
+    });
+  }
+
+  if (!checked) {
+    return (
+      <div className="flex flex-col gap-3">
+        <label className="flex flex-col gap-1 text-sm">
+          Invite code
+          <input
+            value={inviteCode}
+            onChange={(e) => setInviteCode(e.target.value)}
+            required
+            placeholder="ABC123"
+            className={`${inputClass} uppercase`}
+          />
+        </label>
+        <button
+          type="button"
+          onClick={handleCheck}
+          disabled={pending}
+          className={`self-start ${buttonClass}`}
+        >
+          {pending ? "Checking..." : "Continue"}
+        </button>
+        {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      </div>
+    );
+  }
+
+  if (profiles.length > 0 && !claimingAsNew) {
+    return (
+      <div className="flex flex-col gap-3">
+        <p className="text-sm text-neutral-500">
+          Are you one of these? Claiming a profile keeps whatever preferences were already
+          set for you — you can adjust them next.
+        </p>
+        {profiles.map((p) => (
+          <button
+            key={p.id}
+            type="button"
+            onClick={() => handleClaim(p.id)}
+            disabled={pending}
+            className="rounded-md border border-neutral-300 px-3 py-2 text-left text-sm disabled:opacity-50 dark:border-neutral-700"
+          >
+            I&apos;m {p.display_name}
+          </button>
+        ))}
+        <button
+          type="button"
+          onClick={() => setClaimingAsNew(true)}
+          className="text-sm text-neutral-500 underline"
+        >
+          None of these — I&apos;m someone new
+        </button>
+        {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      </div>
+    );
+  }
+
+  return (
+    <form action={joinAction} className="flex flex-col gap-3">
+      <input type="hidden" name="inviteCode" value={inviteCode} />
+      <label className="flex flex-col gap-1 text-sm">
+        Your name
+        <input name="displayName" required placeholder="Alex" className={inputClass} />
+      </label>
+      <button type="submit" disabled={joinPending} className={buttonClass}>
+        {joinPending ? "Joining..." : "Join household"}
+      </button>
+      {joinState.error ? <p className="text-sm text-red-600">{joinState.error}</p> : null}
+    </form>
   );
 }

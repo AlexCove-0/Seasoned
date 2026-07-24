@@ -30,12 +30,20 @@ export default async function Home() {
         </p>
       </header>
 
-      <Link
-        href="/chat"
-        className="rounded-md bg-accent-600 px-4 py-3 text-center text-sm font-medium text-white dark:bg-accent-400 dark:text-white"
-      >
-        Cook up a new recipe
-      </Link>
+      <div className="flex gap-2">
+        <Link
+          href="/chat"
+          className="flex-1 rounded-md bg-accent-600 px-4 py-3 text-center text-sm font-medium text-white dark:bg-accent-400 dark:text-white"
+        >
+          Cook up a new recipe
+        </Link>
+        <Link
+          href="/import"
+          className="flex-1 rounded-md border border-neutral-300 px-4 py-3 text-center text-sm font-medium dark:border-neutral-700"
+        >
+          Import a recipe
+        </Link>
+      </div>
 
       <section>
         <h2 className="mb-2 text-lg font-medium">Your recipes</h2>

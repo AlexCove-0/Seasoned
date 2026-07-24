@@ -59,3 +59,54 @@ export async function logCook(
   revalidatePath(`/recipes/${recipeId}`);
   return { error: null };
 }
+
+export async function submitRating(
+  recipeId: string,
+  memberId: string,
+  rating: number,
+  comment: string,
+) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  await supabase.from("recipe_ratings").upsert(
+    {
+      recipe_id: recipeId,
+      member_id: memberId,
+      rating,
+      comment: comment.trim() || null,
+      created_by: user.id,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "recipe_id,member_id" },
+  );
+
+  revalidatePath(`/recipes/${recipeId}`);
+}
+
+export async function createShareLink(recipeId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const token = crypto.randomUUID().replace(/-/g, "");
+  const { error } = await supabase
+    .from("recipe_shares")
+    .insert({ recipe_id: recipeId, share_token: token, created_by: user.id });
+
+  if (error) return null;
+
+  revalidatePath(`/recipes/${recipeId}`);
+  return token;
+}
+
+export async function revokeShareLink(shareId: string, recipeId: string) {
+  const supabase = await createClient();
+  await supabase.from("recipe_shares").delete().eq("id", shareId);
+  revalidatePath(`/recipes/${recipeId}`);
+}

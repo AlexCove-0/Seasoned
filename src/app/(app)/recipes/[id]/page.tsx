@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { CookLog, Recipe } from "@/lib/types";
+import { getCurrentHousehold } from "@/lib/household";
+import type { CookLog, Recipe, RecipeRating } from "@/lib/types";
 import { CookLogForm } from "./cook-log-form";
 import { RecipeIngredients } from "./recipe-ingredients";
+import { RecipeRatings } from "./recipe-ratings";
+import { RecipeShare } from "./recipe-share";
 
 export default async function RecipePage({
   params,
@@ -16,6 +19,9 @@ export default async function RecipePage({
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  const household = await getCurrentHousehold();
+  if (!household) redirect("/household/setup");
 
   const { data: recipe } = await supabase
     .from("recipes")
@@ -31,6 +37,53 @@ export default async function RecipePage({
     .eq("recipe_id", id)
     .order("cooked_at", { ascending: false })
     .returns<CookLog[]>();
+
+  const { data: members } = await supabase
+    .from("household_members")
+    .select("id, display_name")
+    .eq("household_id", household.id)
+    .order("created_at", { ascending: true })
+    .returns<{ id: string; display_name: string }[]>();
+
+  const { data: ratingsRaw } = await supabase
+    .from("recipe_ratings")
+    .select("id, member_id, rating, comment, updated_at, household_members(display_name)")
+    .eq("recipe_id", id)
+    .returns<
+      {
+        id: string;
+        member_id: string;
+        rating: number;
+        comment: string | null;
+        updated_at: string;
+        household_members: { display_name: string } | { display_name: string }[];
+      }[]
+    >();
+
+  const ratings: RecipeRating[] = (ratingsRaw ?? []).map((r) => {
+    const member = Array.isArray(r.household_members) ? r.household_members[0] : r.household_members;
+    return {
+      id: r.id,
+      member_id: r.member_id,
+      member_name: member?.display_name ?? "Someone",
+      rating: r.rating,
+      comment: r.comment,
+      updated_at: r.updated_at,
+    };
+  });
+
+  const { data: shares } = await supabase
+    .from("recipe_shares")
+    .select("id, share_token")
+    .eq("recipe_id", id)
+    .returns<{ id: string; share_token: string }[]>();
+
+  const { data: guestRatings } = await supabase
+    .from("guest_ratings")
+    .select("id, guest_name, rating, comment")
+    .eq("recipe_id", id)
+    .order("created_at", { ascending: false })
+    .returns<{ id: string; guest_name: string; rating: number; comment: string | null }[]>();
 
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-8 px-4 py-10">
@@ -67,6 +120,13 @@ export default async function RecipePage({
         </ol>
       </section>
 
+      <RecipeRatings
+        recipeId={recipe.id}
+        members={members ?? []}
+        ratings={ratings}
+        guestRatings={guestRatings ?? []}
+      />
+
       <CookLogForm recipeId={recipe.id} defaultServings={recipe.base_servings} />
 
       <section>
@@ -91,6 +151,8 @@ export default async function RecipePage({
           </ul>
         )}
       </section>
+
+      <RecipeShare recipeId={recipe.id} shares={shares ?? []} />
     </main>
   );
 }

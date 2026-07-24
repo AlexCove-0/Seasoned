@@ -91,3 +91,37 @@ export async function joinHousehold(
 
   redirect("/profile/setup");
 }
+
+export type UnclaimedProfile = { id: string; display_name: string };
+
+export async function lookupUnclaimedProfiles(
+  inviteCode: string,
+): Promise<{ profiles: UnclaimedProfile[]; error: string | null }> {
+  const code = inviteCode.trim().toUpperCase();
+  if (!code) return { profiles: [], error: null };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("unclaimed_profiles_for_invite_code", {
+    p_invite_code: code,
+  });
+
+  if (error) return { profiles: [], error: error.message };
+  return { profiles: (data as UnclaimedProfile[]) ?? [], error: null };
+}
+
+export async function claimProfile(inviteCode: string, memberId: string): Promise<State> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "You're not signed in." };
+
+  const { error } = await supabase.rpc("claim_household_profile", {
+    p_invite_code: inviteCode.trim().toUpperCase(),
+    p_member_id: memberId,
+  });
+
+  if (error) return { error: error.message };
+
+  redirect("/profile/setup");
+}

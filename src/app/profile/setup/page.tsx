@@ -2,6 +2,13 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ProfileSetupForm } from "./form";
 
+type ExistingProfile = {
+  display_name: string;
+  taste_preferences: string[];
+  regional_tastes: string[];
+  allergies: string[];
+};
+
 export default async function ProfileSetupPage() {
   const supabase = await createClient();
   const {
@@ -11,9 +18,9 @@ export default async function ProfileSetupPage() {
 
   const { data: member } = await supabase
     .from("household_members")
-    .select("display_name")
+    .select("display_name, taste_preferences, regional_tastes, allergies")
     .eq("user_id", user.id)
-    .maybeSingle<{ display_name: string }>();
+    .maybeSingle<ExistingProfile>();
 
   if (!member) redirect("/household/setup");
 
@@ -26,7 +33,12 @@ export default async function ProfileSetupPage() {
           of it later from Kitchen Preferences.
         </p>
       </div>
-      <ProfileSetupForm defaultDisplayName={member.display_name} />
+      <ProfileSetupForm
+        defaultDisplayName={member.display_name}
+        defaultTastePreferences={member.taste_preferences}
+        defaultRegionalTastes={member.regional_tastes}
+        defaultAllergies={member.allergies}
+      />
     </main>
   );
 }

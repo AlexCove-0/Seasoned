@@ -10,7 +10,17 @@ const inputClass =
 const buttonClass =
   "rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white";
 
-export function ProfileSetupForm({ defaultDisplayName }: { defaultDisplayName: string }) {
+export function ProfileSetupForm({
+  defaultDisplayName,
+  defaultTastePreferences = [],
+  defaultRegionalTastes = [],
+  defaultAllergies = [],
+}: {
+  defaultDisplayName: string;
+  defaultTastePreferences?: string[];
+  defaultRegionalTastes?: string[];
+  defaultAllergies?: string[];
+}) {
   const [state, formAction, pending] = useActionState(saveProfile, { error: null });
 
   return (
@@ -29,6 +39,7 @@ export function ProfileSetupForm({ defaultDisplayName }: { defaultDisplayName: s
         name="tastePreferences"
         label="Taste preferences"
         suggestions={TASTE_PREFERENCES}
+        defaultValue={defaultTastePreferences}
         placeholder="Search flavors or add your own..."
       />
 
@@ -36,6 +47,7 @@ export function ProfileSetupForm({ defaultDisplayName }: { defaultDisplayName: s
         name="regionalTastes"
         label="Regional tastes"
         suggestions={REGIONAL_CUISINES}
+        defaultValue={defaultRegionalTastes}
         placeholder="e.g. Ecuadorian, Mediterranean..."
       />
 
@@ -43,6 +55,7 @@ export function ProfileSetupForm({ defaultDisplayName }: { defaultDisplayName: s
         name="allergies"
         label="Food allergies"
         suggestions={COMMON_ALLERGENS}
+        defaultValue={defaultAllergies}
         placeholder="Search allergens or add your own..."
       />
 
