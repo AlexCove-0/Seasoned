@@ -29,7 +29,7 @@ export async function addPerson(_prevState: State, formData: FormData): Promise<
 
   if (error) return { error: error.message };
 
-  revalidatePath("/settings");
+  revalidatePath("/profiles");
   return { error: null };
 }
 
@@ -55,24 +55,6 @@ export async function updatePerson(_prevState: State, formData: FormData): Promi
 
   if (error) return { error: error.message };
 
-  revalidatePath("/settings");
-  return { error: null };
-}
-
-export async function updateAppliances(_prevState: State, formData: FormData): Promise<State> {
-  const household = await getCurrentHousehold();
-  if (!household) return { error: "No household found." };
-
-  const appliances = formData.getAll("appliances").map(String);
-
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("households")
-    .update({ appliances })
-    .eq("id", household.id);
-
-  if (error) return { error: error.message };
-
-  revalidatePath("/settings");
+  revalidatePath("/profiles");
   return { error: null };
 }

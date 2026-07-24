@@ -21,24 +21,12 @@ export default async function Home() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-8 px-4 py-10">
-      <header className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">{household.name}</h1>
-          <p className="text-sm text-neutral-500">
-            Signed in as {household.display_name} &middot; invite code{" "}
-            <span className="font-mono">{household.invite_code}</span>
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link href="/settings" className="text-sm text-neutral-500 underline">
-            Kitchen Preferences
-          </Link>
-          <form action="/auth/signout" method="post">
-            <button type="submit" className="text-sm text-neutral-500 underline">
-              Sign out
-            </button>
-          </form>
-        </div>
+      <header>
+        <h1 className="text-2xl font-semibold">{household.name}</h1>
+        <p className="text-sm text-neutral-500">
+          Signed in as {household.display_name} &middot; invite code{" "}
+          <span className="font-mono">{household.invite_code}</span>
+        </p>
       </header>
 
       <Link
