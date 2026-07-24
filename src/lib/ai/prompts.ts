@@ -43,8 +43,11 @@ genuinely distinct recipe directions -- different techniques, flavors, or
 formats, not three variations on the same dish. Each should be realistic to
 make with what's on hand plus common pantry basics (oil, salt, flour, etc.).
 
-If a regional twist is specified, all 3 options should fit that style. If not,
-feel free to range across styles rather than defaulting to one.
+If exactly one regional twist is specified, all 3 options should fit that
+single style. If more than one is specified, don't split them one-per-style
+-- blend them, so all 3 options are genuine fusions combining those specific
+styles together. If none is specified, feel free to range across styles
+rather than defaulting to one.
 
 Call suggest_recipe_options with your 3 options. Keep each pitch to 1-2
 sentences -- enticing, specific, no filler.`;
