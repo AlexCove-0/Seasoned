@@ -1,0 +1,55 @@
+"use client";
+
+import { useActionState } from "react";
+import { TagPicker } from "@/components/tag-picker";
+import { TASTE_PREFERENCES, COMMON_ALLERGENS, REGIONAL_CUISINES } from "@/lib/taste-options";
+import { saveProfile } from "./actions";
+
+const inputClass =
+  "rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900";
+const buttonClass =
+  "rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-neutral-900";
+
+export function ProfileSetupForm({ defaultDisplayName }: { defaultDisplayName: string }) {
+  const [state, formAction, pending] = useActionState(saveProfile, { error: null });
+
+  return (
+    <form action={formAction} className="flex flex-col gap-6">
+      <label className="flex flex-col gap-1 text-sm">
+        Your name
+        <input
+          name="displayName"
+          required
+          defaultValue={defaultDisplayName}
+          className={inputClass}
+        />
+      </label>
+
+      <TagPicker
+        name="tastePreferences"
+        label="Taste preferences"
+        suggestions={TASTE_PREFERENCES}
+        placeholder="Search flavors or add your own..."
+      />
+
+      <TagPicker
+        name="regionalTastes"
+        label="Regional tastes"
+        suggestions={REGIONAL_CUISINES}
+        placeholder="e.g. Ecuadorian, Mediterranean..."
+      />
+
+      <TagPicker
+        name="allergies"
+        label="Food allergies"
+        suggestions={COMMON_ALLERGENS}
+        placeholder="Search allergens or add your own..."
+      />
+
+      <button type="submit" disabled={pending} className={buttonClass}>
+        {pending ? "Saving..." : "Continue"}
+      </button>
+      {state.error ? <p className="text-sm text-red-600">{state.error}</p> : null}
+    </form>
+  );
+}

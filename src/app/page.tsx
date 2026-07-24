@@ -29,11 +29,16 @@ export default async function Home() {
             <span className="font-mono">{household.invite_code}</span>
           </p>
         </div>
-        <form action="/auth/signout" method="post">
-          <button type="submit" className="text-sm text-neutral-500 underline">
-            Sign out
-          </button>
-        </form>
+        <div className="flex items-center gap-4">
+          <Link href="/settings" className="text-sm text-neutral-500 underline">
+            Kitchen Preferences
+          </Link>
+          <form action="/auth/signout" method="post">
+            <button type="submit" className="text-sm text-neutral-500 underline">
+              Sign out
+            </button>
+          </form>
+        </div>
       </header>
 
       <Link

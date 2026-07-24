@@ -3,12 +3,21 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 import type { RecipeDraft } from "@/lib/ai/tools";
-import { saveRecipe } from "./actions";
+import { saveRecipe, bumpIngredientsUsage } from "./actions";
+import { SessionSetup, type SessionConfig } from "./session-setup";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
+type Member = { id: string; display_name: string };
 
-export function ChatClient() {
+export function ChatClient({
+  members,
+  topIngredients,
+}: {
+  members: Member[];
+  topIngredients: string[];
+}) {
   const router = useRouter();
+  const [config, setConfig] = useState<SessionConfig | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [recipe, setRecipe] = useState<RecipeDraft | null>(null);
@@ -17,9 +26,17 @@ export function ChatClient() {
   const [saving, startSaving] = useTransition();
   const listRef = useRef<HTMLDivElement>(null);
 
+  function handleStart(newConfig: SessionConfig) {
+    setConfig(newConfig);
+    // Fire-and-forget usage tracking -- shouldn't block entering the chat.
+    if (newConfig.ingredientsOnHand.length > 0) {
+      void bumpIngredientsUsage(newConfig.ingredientsOnHand);
+    }
+  }
+
   async function send() {
     const text = input.trim();
-    if (!text || sending) return;
+    if (!text || sending || !config) return;
 
     const nextMessages: ChatMessage[] = [...messages, { role: "user", content: text }];
     setMessages(nextMessages);
@@ -32,7 +49,13 @@ export function ChatClient() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextMessages }),
+        body: JSON.stringify({
+          messages: nextMessages,
+          dinerIds: config.dinerIds,
+          servings: config.servings,
+          regionalTwist: config.regionalTwist,
+          ingredientsOnHand: config.ingredientsOnHand,
+        }),
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -62,13 +85,38 @@ export function ChatClient() {
     });
   }
 
+  if (!config) {
+    return <SessionSetup members={members} topIngredients={topIngredients} onStart={handleStart} />;
+  }
+
+  const dinerNames = members.filter((m) => config.dinerIds.includes(m.id)).map((m) => m.display_name);
+
   return (
     <div className="flex flex-1 flex-col gap-4">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-neutral-200 pb-4 text-xs text-neutral-500 dark:border-neutral-800">
+        <span>{dinerNames.length > 0 ? dinerNames.join(", ") : "No one selected"}</span>
+        <span>&middot;</span>
+        <span>{config.servings} serving(s)</span>
+        {config.regionalTwist.length > 0 ? (
+          <>
+            <span>&middot;</span>
+            <span>{config.regionalTwist.join(", ")} twist</span>
+          </>
+        ) : null}
+        <button
+          type="button"
+          onClick={() => setConfig(null)}
+          className="ml-auto underline hover:text-neutral-900 dark:hover:text-white"
+        >
+          Edit setup
+        </button>
+      </div>
+
       <div ref={listRef} className="flex flex-1 flex-col gap-4 overflow-y-auto pb-4">
         {messages.length === 0 ? (
           <p className="text-sm text-neutral-500">
-            Tell me what you&apos;ve got on hand, or what you&apos;re craving, and I&apos;ll help
-            you build it out.
+            Tell me what you&apos;re craving, or just say go and I&apos;ll work from what&apos;s on
+            hand.
           </p>
         ) : null}
         {messages.map((m, i) => (

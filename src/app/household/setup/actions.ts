@@ -22,14 +22,17 @@ export async function createHousehold(
   } = await supabase.auth.getUser();
   if (!user) return { error: "You're not signed in." };
 
-  // Invite codes are unique; retry on the rare collision.
+  // Invite codes are unique; retry on the rare collision. The id is generated
+  // client-side (rather than relying on INSERT...RETURNING) because right
+  // after creating the household the current user isn't a member yet, so the
+  // households SELECT policy would hide the row from RETURNING and PostgREST
+  // reports that as an RLS violation.
   for (let attempt = 0; attempt < 5; attempt++) {
+    const householdId = crypto.randomUUID();
     const inviteCode = generateInviteCode();
-    const { data: household, error: householdError } = await supabase
+    const { error: householdError } = await supabase
       .from("households")
-      .insert({ name: householdName, invite_code: inviteCode })
-      .select("id")
-      .single();
+      .insert({ id: householdId, name: householdName, invite_code: inviteCode });
 
     if (householdError) {
       if (householdError.code === "23505") continue; // invite_code collision, retry
@@ -39,14 +42,14 @@ export async function createHousehold(
     const { error: memberError } = await supabase
       .from("household_members")
       .insert({
-        household_id: household.id,
+        household_id: householdId,
         user_id: user.id,
         display_name: displayName,
       });
 
     if (memberError) return { error: memberError.message };
 
-    redirect("/");
+    redirect("/profile/setup");
   }
 
   return { error: "Couldn't generate a unique invite code, try again." };
@@ -86,5 +89,5 @@ export async function joinHousehold(
 
   if (memberError) return { error: memberError.message };
 
-  redirect("/");
+  redirect("/profile/setup");
 }

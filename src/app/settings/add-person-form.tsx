@@ -1,0 +1,80 @@
+"use client";
+
+import { useActionState, useEffect, useState } from "react";
+import { TagPicker } from "@/components/tag-picker";
+import { TASTE_PREFERENCES, COMMON_ALLERGENS, REGIONAL_CUISINES } from "@/lib/taste-options";
+import { addPerson } from "./actions";
+
+const inputClass =
+  "rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900";
+const buttonClass =
+  "rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-neutral-900";
+
+export function AddPersonForm() {
+  const [open, setOpen] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [formKey, setFormKey] = useState(0);
+  const [state, formAction, pending] = useActionState(addPerson, { error: null });
+
+  useEffect(() => {
+    if (submitted && !pending && !state.error) {
+      setOpen(false);
+      setSubmitted(false);
+      setFormKey((k) => k + 1);
+    }
+  }, [submitted, pending, state.error]);
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="self-start text-sm text-neutral-500 underline"
+      >
+        + Add a person
+      </button>
+    );
+  }
+
+  return (
+    <form
+      key={formKey}
+      action={formAction}
+      className="flex flex-col gap-4 rounded-lg border border-neutral-300 p-4 dark:border-neutral-700"
+    >
+      <label className="flex flex-col gap-1 text-sm">
+        Name
+        <input
+          name="displayName"
+          required
+          placeholder="e.g. your daughter's name"
+          className={inputClass}
+        />
+      </label>
+      <p className="text-xs text-neutral-500">
+        For people who cook with you but won&apos;t sign in themselves — no email needed.
+      </p>
+      <TagPicker name="tastePreferences" label="Taste preferences" suggestions={TASTE_PREFERENCES} />
+      <TagPicker name="regionalTastes" label="Regional tastes" suggestions={REGIONAL_CUISINES} />
+      <TagPicker name="allergies" label="Food allergies" suggestions={COMMON_ALLERGENS} />
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          disabled={pending}
+          className={buttonClass}
+          onClick={() => setSubmitted(true)}
+        >
+          {pending ? "Adding..." : "Add person"}
+        </button>
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="rounded-md px-3 py-2 text-sm text-neutral-500"
+        >
+          Cancel
+        </button>
+      </div>
+      {state.error ? <p className="text-sm text-red-600">{state.error}</p> : null}
+    </form>
+  );
+}

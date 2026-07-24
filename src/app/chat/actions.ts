@@ -42,3 +42,16 @@ export async function saveRecipe(recipe: RecipeDraft, transcript: ChatMessage[])
 
   return savedRecipe.id as string;
 }
+
+export async function bumpIngredientsUsage(names: string[]) {
+  if (names.length === 0) return;
+
+  const household = await getCurrentHousehold();
+  if (!household) return;
+
+  const supabase = await createClient();
+  await supabase.rpc("bump_ingredients_usage", {
+    p_household_id: household.id,
+    p_names: names,
+  });
+}
