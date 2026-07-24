@@ -12,19 +12,20 @@ const inputClass =
 const buttonClass =
   "rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white";
 
-function ChipRow({ tags, dim = false }: { tags: string[]; dim?: boolean }) {
+type ChipColor = "green" | "red" | "yellow";
+
+const chipColorClass: Record<ChipColor, string> = {
+  green: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
+  red: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
+  yellow: "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300",
+};
+
+function ChipRow({ tags, color }: { tags: string[]; color: ChipColor }) {
   if (tags.length === 0) return <span className="text-neutral-400">None set</span>;
   return (
     <span className="flex flex-wrap gap-1">
       {tags.map((t) => (
-        <span
-          key={t}
-          className={
-            dim
-              ? "rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500 line-through dark:bg-neutral-800"
-              : "rounded-full bg-neutral-100 px-2 py-0.5 text-xs dark:bg-neutral-800"
-          }
-        >
+        <span key={t} className={`rounded-full px-2 py-0.5 text-xs ${chipColorClass[color]}`}>
           {t}
         </span>
       ))}
@@ -37,10 +38,30 @@ export function PersonCard({ member }: { member: Member }) {
   const [submitted, setSubmitted] = useState(false);
   const [state, formAction, pending] = useActionState(updatePerson, { error: null });
   const [favoritePending, startFavoriteTransition] = useTransition();
+  const [inviteCopied, setInviteCopied] = useState(false);
 
   useEffect(() => {
     if (submitted && !pending && !state.error) setEditing(false);
   }, [submitted, pending, state.error]);
+
+  async function sendInvite() {
+    const url = `${window.location.origin}/invite/${member.invite_token}`;
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share({
+          title: "Taste profile for Seasoned",
+          text: `Hey ${member.display_name}, fill out your taste profile so recipes actually turn out how you like them:`,
+          url,
+        });
+        return;
+      } catch {
+        return; // share sheet dismissed -- nothing to do
+      }
+    }
+    await navigator.clipboard.writeText(url);
+    setInviteCopied(true);
+    setTimeout(() => setInviteCopied(false), 2000);
+  }
 
   if (!editing) {
     return (
@@ -59,35 +80,43 @@ export function PersonCard({ member }: { member: Member }) {
               {member.is_favorite ? "★" : "☆"}
             </button>
             {member.display_name}
-            {!member.user_id ? (
-              <span className="text-xs font-normal text-neutral-400">no login</span>
-            ) : null}
           </span>
-          <button
-            type="button"
-            onClick={() => setEditing(true)}
-            className="text-xs text-neutral-500 underline hover:text-neutral-900 dark:hover:text-white"
-          >
-            Edit
-          </button>
+          <div className="flex items-center gap-3">
+            {!member.user_id ? (
+              <button
+                type="button"
+                onClick={sendInvite}
+                className="rounded-full border border-neutral-300 px-2 py-0.5 text-xs text-neutral-500 hover:border-accent-600 hover:text-accent-600 dark:border-neutral-700 dark:hover:border-accent-400 dark:hover:text-accent-400"
+              >
+                {inviteCopied ? "Link copied!" : "Send Invite"}
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="text-xs text-neutral-500 underline hover:text-neutral-900 dark:hover:text-white"
+            >
+              Edit
+            </button>
+          </div>
         </div>
         <dl className="flex flex-col gap-1.5">
           <div className="flex gap-2">
             <dt className="w-24 shrink-0 text-neutral-500">Likes</dt>
             <dd>
-              <ChipRow tags={member.taste_preferences} />
+              <ChipRow tags={member.taste_preferences} color="green" />
             </dd>
           </div>
           <div className="flex gap-2">
             <dt className="w-24 shrink-0 text-neutral-500">Dislikes</dt>
             <dd>
-              <ChipRow tags={member.disliked_tastes} dim />
+              <ChipRow tags={member.disliked_tastes} color="red" />
             </dd>
           </div>
           <div className="flex gap-2">
             <dt className="w-24 shrink-0 text-neutral-500">Allergies</dt>
             <dd>
-              <ChipRow tags={member.allergies} />
+              <ChipRow tags={member.allergies} color="yellow" />
             </dd>
           </div>
         </dl>

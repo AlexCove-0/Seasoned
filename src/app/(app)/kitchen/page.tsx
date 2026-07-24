@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
-import { RecipeCarousel } from "@/components/recipe-carousel";
-import { topRecipes, recommendedRecipes, type RankedRecipe } from "@/lib/recipe-ranking";
 import { HouseholdNameEditor } from "./household-name-editor";
 import { ProfilesSection } from "./profiles-section";
 import { AppliancesForm } from "./appliances-form";
@@ -16,6 +14,7 @@ export type Member = {
   disliked_tastes: string[];
   allergies: string[];
   is_favorite: boolean;
+  invite_token: string;
 };
 
 export default async function KitchenPage() {
@@ -30,7 +29,9 @@ export default async function KitchenPage() {
 
   const { data: members } = await supabase
     .from("household_members")
-    .select("id, user_id, display_name, taste_preferences, disliked_tastes, allergies, is_favorite")
+    .select(
+      "id, user_id, display_name, taste_preferences, disliked_tastes, allergies, is_favorite, invite_token",
+    )
     .eq("household_id", household.id)
     .order("created_at", { ascending: true })
     .returns<Member[]>();
@@ -41,30 +42,9 @@ export default async function KitchenPage() {
     .eq("id", household.id)
     .single<{ appliances: string[]; pantry_staples: string[] }>();
 
-  const { data: recipesWithLogs } = await supabase
-    .from("recipes")
-    .select("id, title, base_servings, cook_logs(rating, cooked_at)")
-    .returns<RankedRecipe[]>();
-
-  const recipes = recipesWithLogs ?? [];
-  const top = topRecipes(recipes);
-  const recommended = recommendedRecipes(recipes, new Set(top.map((r) => r.id)));
-
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-10 px-4 py-10">
       <HouseholdNameEditor name={household.name} />
-
-      <RecipeCarousel
-        title="Top recipes"
-        recipes={top}
-        emptyText="Log a few cooks with a rating and your best dishes will show up here."
-      />
-
-      <RecipeCarousel
-        title="Recommended"
-        recipes={recommended}
-        emptyText="Save a recipe and it'll show up here."
-      />
 
       <ProfilesSection members={members ?? []} />
 

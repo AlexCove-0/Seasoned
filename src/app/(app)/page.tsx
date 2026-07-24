@@ -2,6 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
+import { RecipeCarousel } from "@/components/recipe-carousel";
+import { topRecipes, recommendedRecipes, type RankedRecipe } from "@/lib/recipe-ranking";
 import { RecipeList } from "./recipe-list";
 
 export default async function Home() {
@@ -19,6 +21,15 @@ export default async function Home() {
     .select("id, title, base_servings, created_at")
     .order("created_at", { ascending: false })
     .returns<{ id: string; title: string; base_servings: number; created_at: string }[]>();
+
+  const { data: recipesWithLogs } = await supabase
+    .from("recipes")
+    .select("id, title, base_servings, cook_logs(rating, cooked_at)")
+    .returns<RankedRecipe[]>();
+
+  const ranked = recipesWithLogs ?? [];
+  const top = topRecipes(ranked);
+  const recommended = recommendedRecipes(ranked, new Set(top.map((r) => r.id)));
 
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-8 px-4 py-10">
@@ -44,6 +55,18 @@ export default async function Home() {
           Import a recipe
         </Link>
       </div>
+
+      <RecipeCarousel
+        title="Top recipes"
+        recipes={top}
+        emptyText="Log a few cooks with a rating and your best dishes will show up here."
+      />
+
+      <RecipeCarousel
+        title="Recommended"
+        recipes={recommended}
+        emptyText="Save a recipe and it'll show up here."
+      />
 
       <section>
         <h2 className="mb-2 text-lg font-medium">Your recipes</h2>
