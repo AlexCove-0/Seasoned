@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import type { RecipeDraft } from "@/lib/ai/tools";
 import { saveRecipe } from "../chat/actions";
 
@@ -11,14 +11,16 @@ export function ImportClient() {
   const [text, setText] = useState("");
   const [importing, setImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [recipe, setRecipe] = useState<RecipeDraft | null>(null);
-  const [saving, startSaving] = useTransition();
+
+  async function saveAndOpen(recipe: RecipeDraft) {
+    const id = await saveRecipe(recipe, []);
+    router.push(`/recipes/${id}`);
+  }
 
   async function importText() {
     if (!text.trim() || importing) return;
     setImporting(true);
     setError(null);
-    setRecipe(null);
     try {
       const res = await fetch("/api/import-recipe", {
         method: "POST",
@@ -27,10 +29,9 @@ export function ImportClient() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Couldn't import that.");
-      setRecipe(data.recipe as RecipeDraft);
+      await saveAndOpen(data.recipe as RecipeDraft);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't import that.");
-    } finally {
       setImporting(false);
     }
   }
@@ -38,7 +39,6 @@ export function ImportClient() {
   function importImage(file: File) {
     setImporting(true);
     setError(null);
-    setRecipe(null);
     const reader = new FileReader();
     reader.onload = async () => {
       try {
@@ -53,10 +53,9 @@ export function ImportClient() {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error ?? "Couldn't read that photo.");
-        setRecipe(data.recipe as RecipeDraft);
+        await saveAndOpen(data.recipe as RecipeDraft);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Couldn't read that photo.");
-      } finally {
         setImporting(false);
       }
     };
@@ -65,14 +64,6 @@ export function ImportClient() {
       setImporting(false);
     };
     reader.readAsDataURL(file);
-  }
-
-  function handleSave() {
-    if (!recipe) return;
-    startSaving(async () => {
-      const id = await saveRecipe(recipe, []);
-      router.push(`/recipes/${id}`);
-    });
   }
 
   return (
@@ -110,7 +101,7 @@ export function ImportClient() {
             disabled={importing || !text.trim()}
             className="self-start rounded-md bg-accent-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white"
           >
-            {importing ? "Reading..." : "Import"}
+            {importing ? "Saving to your book..." : "Import"}
           </button>
         </div>
       ) : (
@@ -124,28 +115,11 @@ export function ImportClient() {
             }}
             className="text-sm"
           />
-          {importing ? <p className="text-sm text-neutral-400">Reading the photo...</p> : null}
+          {importing ? <p className="text-sm text-neutral-400">Reading the photo and saving it to your book...</p> : null}
         </div>
       )}
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
-
-      {recipe ? (
-        <div className="rounded-lg border border-neutral-300 p-4 dark:border-neutral-700">
-          <h3 className="font-medium">{recipe.title}</h3>
-          <p className="mb-3 text-sm text-neutral-500">
-            Serves {recipe.base_servings} &middot; {recipe.ingredients.length} ingredients &middot;{" "}
-            {recipe.steps.length} steps
-          </p>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white"
-          >
-            {saving ? "Saving..." : "Save this recipe"}
-          </button>
-        </div>
-      ) : null}
     </div>
   );
 }
