@@ -7,7 +7,7 @@ import { saveRecipe, bumpIngredientsUsage } from "./actions";
 import { SessionSetup, type SessionConfig } from "./session-setup";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
-type Member = { id: string; display_name: string };
+type Member = { id: string; display_name: string; is_favorite: boolean };
 
 export function ChatClient({
   members,

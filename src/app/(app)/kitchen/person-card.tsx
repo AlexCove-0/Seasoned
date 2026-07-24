@@ -1,9 +1,9 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useState, useTransition } from "react";
 import { TagPicker } from "@/components/tag-picker";
 import { TASTE_PREFERENCES, COMMON_ALLERGENS, REGIONAL_CUISINES } from "@/lib/taste-options";
-import { updatePerson } from "./actions";
+import { updatePerson, toggleFavorite } from "./profile-actions";
 import type { Member } from "./page";
 
 const inputClass =
@@ -31,6 +31,7 @@ export function PersonCard({ member }: { member: Member }) {
   const [editing, setEditing] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [state, formAction, pending] = useActionState(updatePerson, { error: null });
+  const [favoritePending, startFavoriteTransition] = useTransition();
 
   useEffect(() => {
     if (submitted && !pending && !state.error) setEditing(false);
@@ -40,10 +41,21 @@ export function PersonCard({ member }: { member: Member }) {
     return (
       <div className="rounded-lg border border-neutral-200 p-4 text-sm dark:border-neutral-800">
         <div className="mb-2 flex items-center justify-between">
-          <span className="font-medium">
+          <span className="flex items-center gap-1.5 font-medium">
+            <button
+              type="button"
+              disabled={favoritePending}
+              onClick={() =>
+                startFavoriteTransition(() => toggleFavorite(member.id, !member.is_favorite))
+              }
+              aria-label={member.is_favorite ? "Remove from favorites" : "Add to favorites"}
+              className="text-base leading-none text-amber-500 disabled:opacity-50"
+            >
+              {member.is_favorite ? "★" : "☆"}
+            </button>
             {member.display_name}
             {!member.user_id ? (
-              <span className="ml-2 text-xs font-normal text-neutral-400">no login</span>
+              <span className="text-xs font-normal text-neutral-400">no login</span>
             ) : null}
           </span>
           <button
@@ -87,6 +99,10 @@ export function PersonCard({ member }: { member: Member }) {
       <label className="flex flex-col gap-1 text-sm">
         Name
         <input name="displayName" required defaultValue={member.display_name} className={inputClass} />
+      </label>
+      <label className="flex items-center gap-2 text-sm">
+        <input type="checkbox" name="isFavorite" defaultChecked={member.is_favorite} className="h-4 w-4" />
+        Favorite — show by default when picking who you&apos;re cooking for
       </label>
       <TagPicker
         name="tastePreferences"

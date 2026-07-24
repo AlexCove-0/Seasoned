@@ -15,10 +15,10 @@ export default async function ChatPage() {
 
   const { data: members } = await supabase
     .from("household_members")
-    .select("id, display_name")
+    .select("id, display_name, is_favorite")
     .eq("household_id", household.id)
     .order("created_at", { ascending: true })
-    .returns<{ id: string; display_name: string }[]>();
+    .returns<{ id: string; display_name: string; is_favorite: boolean }[]>();
 
   const { data: topIngredients } = await supabase
     .from("household_ingredients")
@@ -28,12 +28,19 @@ export default async function ChatPage() {
     .limit(15)
     .returns<{ name: string }[]>();
 
+  const { data: householdRow } = await supabase
+    .from("households")
+    .select("pantry_staples")
+    .eq("id", household.id)
+    .single<{ pantry_staples: string[] }>();
+
+  const ingredientSuggestions = [
+    ...new Set([...(householdRow?.pantry_staples ?? []), ...(topIngredients ?? []).map((i) => i.name)]),
+  ];
+
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col px-4 py-6">
-      <ChatClient
-        members={members ?? []}
-        topIngredients={(topIngredients ?? []).map((i) => i.name)}
-      />
+      <ChatClient members={members ?? []} topIngredients={ingredientSuggestions} />
     </main>
   );
 }

@@ -16,6 +16,7 @@ export async function addPerson(_prevState: State, formData: FormData): Promise<
   const tastePreferences = formData.getAll("tastePreferences").map(String);
   const regionalTastes = formData.getAll("regionalTastes").map(String);
   const allergies = formData.getAll("allergies").map(String);
+  const isFavorite = formData.get("isFavorite") === "on";
 
   const supabase = await createClient();
   const { error } = await supabase.from("household_members").insert({
@@ -25,11 +26,12 @@ export async function addPerson(_prevState: State, formData: FormData): Promise<
     taste_preferences: tastePreferences,
     regional_tastes: regionalTastes,
     allergies,
+    is_favorite: isFavorite,
   });
 
   if (error) return { error: error.message };
 
-  revalidatePath("/profiles");
+  revalidatePath("/kitchen");
   return { error: null };
 }
 
@@ -41,6 +43,7 @@ export async function updatePerson(_prevState: State, formData: FormData): Promi
   const tastePreferences = formData.getAll("tastePreferences").map(String);
   const regionalTastes = formData.getAll("regionalTastes").map(String);
   const allergies = formData.getAll("allergies").map(String);
+  const isFavorite = formData.get("isFavorite") === "on";
 
   const supabase = await createClient();
   const { error } = await supabase
@@ -50,11 +53,18 @@ export async function updatePerson(_prevState: State, formData: FormData): Promi
       taste_preferences: tastePreferences,
       regional_tastes: regionalTastes,
       allergies,
+      is_favorite: isFavorite,
     })
     .eq("id", memberId);
 
   if (error) return { error: error.message };
 
-  revalidatePath("/profiles");
+  revalidatePath("/kitchen");
   return { error: null };
+}
+
+export async function toggleFavorite(memberId: string, isFavorite: boolean) {
+  const supabase = await createClient();
+  await supabase.from("household_members").update({ is_favorite: isFavorite }).eq("id", memberId);
+  revalidatePath("/kitchen");
 }

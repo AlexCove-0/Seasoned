@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useState } from "react";
 import { TagPicker } from "@/components/tag-picker";
 import { TASTE_PREFERENCES, COMMON_ALLERGENS, REGIONAL_CUISINES } from "@/lib/taste-options";
-import { addPerson } from "./actions";
+import { addPerson } from "./profile-actions";
 
 const inputClass =
   "rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900";
@@ -54,6 +54,10 @@ export function AddPersonForm() {
       <p className="text-xs text-neutral-500">
         For people who cook with you but won&apos;t sign in themselves — no email needed.
       </p>
+      <label className="flex items-center gap-2 text-sm">
+        <input type="checkbox" name="isFavorite" defaultChecked className="h-4 w-4" />
+        Favorite — show by default when picking who you&apos;re cooking for
+      </label>
       <TagPicker name="tastePreferences" label="Taste preferences" suggestions={TASTE_PREFERENCES} />
       <TagPicker name="regionalTastes" label="Regional tastes" suggestions={REGIONAL_CUISINES} />
       <TagPicker name="allergies" label="Food allergies" suggestions={COMMON_ALLERGENS} />

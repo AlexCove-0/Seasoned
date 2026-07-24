@@ -4,7 +4,7 @@ import { useState } from "react";
 import { TagPicker } from "@/components/tag-picker";
 import { REGIONAL_CUISINES } from "@/lib/taste-options";
 
-type Member = { id: string; display_name: string };
+type Member = { id: string; display_name: string; is_favorite: boolean };
 
 export type SessionConfig = {
   dinerIds: string[];
@@ -22,8 +22,12 @@ export function SessionSetup({
   topIngredients: string[];
   onStart: (config: SessionConfig) => void;
 }) {
-  const [dinerIds, setDinerIds] = useState<string[]>(members.map((m) => m.id));
-  const [servings, setServings] = useState(Math.max(members.length, 1));
+  const favorites = members.filter((m) => m.is_favorite);
+  const rest = members.filter((m) => !m.is_favorite);
+  const [showAll, setShowAll] = useState(false);
+
+  const [dinerIds, setDinerIds] = useState<string[]>(favorites.map((m) => m.id));
+  const [servings, setServings] = useState(Math.max(favorites.length, 1));
   const [regionalTwist, setRegionalTwist] = useState<string[]>([]);
   const [ingredientsOnHand, setIngredientsOnHand] = useState<string[]>([]);
 
@@ -31,13 +35,15 @@ export function SessionSetup({
     setDinerIds((prev) => (prev.includes(id) ? prev.filter((d) => d !== id) : [...prev, id]));
   }
 
+  const visibleMembers = showAll ? members : favorites;
+
   return (
     <div className="flex flex-1 flex-col gap-6">
       {members.length > 0 ? (
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium">Cooking for</span>
-          <div className="flex flex-wrap gap-2">
-            {members.map((m) => {
+          <div className="flex flex-wrap items-center gap-2">
+            {visibleMembers.map((m) => {
               const active = dinerIds.includes(m.id);
               return (
                 <button
@@ -54,6 +60,16 @@ export function SessionSetup({
                 </button>
               );
             })}
+            {!showAll && rest.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => setShowAll(true)}
+                aria-label="Show more profiles"
+                className="rounded-full border border-dashed border-neutral-300 px-2.5 py-1 text-xs text-neutral-400 hover:border-neutral-500 hover:text-neutral-900 dark:border-neutral-700 dark:hover:text-white"
+              >
+                +
+              </button>
+            ) : null}
           </div>
         </div>
       ) : null}
