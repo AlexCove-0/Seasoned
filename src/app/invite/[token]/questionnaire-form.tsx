@@ -6,22 +6,55 @@ import { TastePicker } from "@/components/taste-picker";
 import { TASTE_PREFERENCES, COMMON_ALLERGENS } from "@/lib/taste-options";
 import { submitTasteQuestionnaire } from "./actions";
 
-export function QuestionnaireForm({ token, displayName }: { token: string; displayName: string }) {
+const HIGHLIGHTS = [
+  "Recipes come from real conversations with an AI chef instructor, not generic search results, and get saved for good instead of lost in a chat.",
+  "Every recipe adjusts for who's actually eating, using taste profiles like the one you just filled out.",
+  "Rate and log each time you cook something so the household's best dishes rise to the top over time.",
+  "A shopping list builds itself from whatever you're cooking next.",
+];
+
+export function QuestionnaireForm({
+  token,
+  displayName,
+  householdName,
+}: {
+  token: string;
+  displayName: string;
+  householdName: string;
+}) {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   if (submitted) {
     return (
-      <div className="flex flex-col gap-3 rounded-lg border border-accent-600/30 bg-accent-50 p-4 text-sm dark:border-accent-400/30 dark:bg-transparent">
+      <div className="flex flex-col gap-5 rounded-lg border border-accent-600/30 bg-accent-50 p-5 text-sm dark:border-accent-400/30 dark:bg-transparent">
         <p>Thanks, {displayName}! Your taste profile is saved.</p>
-        <p className="text-neutral-500">
-          Want recipes built around it? Sign in at{" "}
-          <a href="/" className="underline">
-            seasoned.app
-          </a>{" "}
-          with the same household to claim your profile and start cooking.
-        </p>
+
+        <div className="flex flex-col gap-2">
+          <p className="font-medium">A few things Seasoned does for {householdName}:</p>
+          <ul className="flex flex-col gap-1.5 text-neutral-600 dark:text-neutral-400">
+            {HIGHLIGHTS.map((h) => (
+              <li key={h} className="flex gap-2">
+                <span className="text-accent-600 dark:text-accent-400">&bull;</span>
+                <span>{h}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="flex flex-col gap-1 border-t border-accent-600/20 pt-4 dark:border-accent-400/20">
+          <p>
+            Sign in at{" "}
+            <a href="/" className="font-medium underline">
+              seasoned.app
+            </a>{" "}
+            with this same household to claim your profile and start cooking.
+          </p>
+          <p className="text-neutral-500">
+            On your phone, open it in Safari and use Share &rarr; Add to Home Screen for an app icon.
+          </p>
+        </div>
       </div>
     );
   }
