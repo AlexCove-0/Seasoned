@@ -1,8 +1,34 @@
 @import "tailwindcss";
 
+/*
+  "Clean Counter" -- airy, minimal, warm-neutral ground with a single
+  restrained accent (forest green). Retints Tailwind's built-in neutral
+  scale rather than introducing new utility names, so every existing
+  neutral-* / dark:neutral-* class across the app picks this up for free.
+*/
+@theme {
+  --color-neutral-50: #faf8f5;
+  --color-neutral-100: #f5f1ea;
+  --color-neutral-200: #e7e1d6;
+  --color-neutral-300: #d9d0c0;
+  --color-neutral-400: #b3a890;
+  --color-neutral-500: #83796c;
+  --color-neutral-600: #6b6154;
+  --color-neutral-700: #514940;
+  --color-neutral-800: #33302a;
+  --color-neutral-900: #211f1b;
+  --color-neutral-950: #16140f;
+
+  --color-accent-50: #eef4ef;
+  --color-accent-400: #4f9d5c;
+  --color-accent-500: #3d6f44;
+  --color-accent-600: #2f5233;
+  --color-accent-700: #24401f;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf8f5;
+  --foreground: #211f1b;
 }
 
 @theme inline {
@@ -14,13 +40,13 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #16140f;
+    --foreground: #f1ead9;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
 }

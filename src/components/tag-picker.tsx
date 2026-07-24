@@ -62,7 +62,7 @@ export function TagPicker({
           {tags.map((t) => (
             <span
               key={t}
-              className="flex items-center gap-1 rounded-full bg-neutral-900 px-2.5 py-1 text-xs text-white dark:bg-white dark:text-neutral-900"
+              className="flex items-center gap-1 rounded-full bg-accent-600 px-2.5 py-1 text-xs text-white dark:bg-accent-400 dark:text-white"
             >
               {t}
               <button

@@ -44,7 +44,7 @@ export default async function RecipePage({
 
       <Link
         href={`/recipes/${recipe.id}/cook`}
-        className="rounded-md bg-neutral-900 px-4 py-3 text-center text-sm font-medium text-white dark:bg-white dark:text-neutral-900"
+        className="rounded-md bg-accent-600 px-4 py-3 text-center text-sm font-medium text-white dark:bg-accent-400 dark:text-white"
       >
         Start cooking
       </Link>

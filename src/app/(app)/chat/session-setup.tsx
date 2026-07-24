@@ -52,7 +52,7 @@ export function SessionSetup({
                   onClick={() => toggleDiner(m.id)}
                   className={
                     active
-                      ? "rounded-full bg-neutral-900 px-3 py-1 text-xs text-white dark:bg-white dark:text-neutral-900"
+                      ? "rounded-full bg-accent-600 px-3 py-1 text-xs text-white dark:bg-accent-400 dark:text-white"
                       : "rounded-full border border-neutral-300 px-3 py-1 text-xs text-neutral-500 dark:border-neutral-700"
                   }
                 >
@@ -102,7 +102,7 @@ export function SessionSetup({
       <button
         type="button"
         onClick={() => onStart({ dinerIds, servings, regionalTwist, ingredientsOnHand })}
-        className="self-start rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white dark:bg-white dark:text-neutral-900"
+        className="self-start rounded-md bg-accent-600 px-4 py-2 text-sm font-medium text-white dark:bg-accent-400 dark:text-white"
       >
         Start cooking
       </button>

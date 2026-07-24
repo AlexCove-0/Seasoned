@@ -25,7 +25,7 @@ export function Nav() {
               href={link.href}
               className={
                 active
-                  ? "shrink-0 rounded-full bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white dark:bg-white dark:text-neutral-900"
+                  ? "shrink-0 rounded-full bg-accent-600 px-3 py-1.5 text-xs font-medium text-white dark:bg-accent-400 dark:text-white"
                   : "shrink-0 rounded-full px-3 py-1.5 text-xs font-medium text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
               }
             >

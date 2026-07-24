@@ -49,7 +49,7 @@ export function HouseholdNameEditor({ name }: { name: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-neutral-900 px-2 py-1 text-xs font-medium text-white disabled:opacity-50 dark:bg-white dark:text-neutral-900"
+        className="rounded-md bg-accent-600 px-2 py-1 text-xs font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white"
       >
         {pending ? "Saving..." : "Save"}
       </button>

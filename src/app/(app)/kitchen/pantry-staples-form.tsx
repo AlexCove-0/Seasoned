@@ -6,7 +6,7 @@ import { PANTRY_STAPLES } from "@/lib/taste-options";
 import { updatePantryStaples } from "./kitchen-actions";
 
 const buttonClass =
-  "self-start rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-neutral-900";
+  "self-start rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white";
 
 export function PantryStaplesForm({ defaultValue }: { defaultValue: string[] }) {
   const [state, formAction, pending] = useActionState(updatePantryStaples, { error: null });

@@ -8,7 +8,7 @@ import { saveProfile } from "./actions";
 const inputClass =
   "rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900";
 const buttonClass =
-  "rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-neutral-900";
+  "rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white";
 
 export function ProfileSetupForm({ defaultDisplayName }: { defaultDisplayName: string }) {
   const [state, formAction, pending] = useActionState(saveProfile, { error: null });

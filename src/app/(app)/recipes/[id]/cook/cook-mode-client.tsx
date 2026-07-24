@@ -168,14 +168,14 @@ export function CookModeClient({ recipe }: { recipe: Recipe }) {
         {isLast ? (
           <Link
             href={`/recipes/${recipe.id}`}
-            className="flex-1 rounded-md bg-neutral-900 px-4 py-3 text-center text-sm font-medium text-white dark:bg-white dark:text-neutral-900"
+            className="flex-1 rounded-md bg-accent-600 px-4 py-3 text-center text-sm font-medium text-white dark:bg-accent-400 dark:text-white"
           >
             Done — log this cook
           </Link>
         ) : (
           <button
             onClick={() => setStepIndex((i) => Math.min(recipe.steps.length - 1, i + 1))}
-            className="flex-1 rounded-md bg-neutral-900 px-4 py-3 text-sm font-medium text-white dark:bg-white dark:text-neutral-900"
+            className="flex-1 rounded-md bg-accent-600 px-4 py-3 text-sm font-medium text-white dark:bg-accent-400 dark:text-white"
           >
             Next
           </button>

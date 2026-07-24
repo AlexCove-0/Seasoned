@@ -9,7 +9,7 @@ import type { Member } from "./page";
 const inputClass =
   "rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900";
 const buttonClass =
-  "rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-neutral-900";
+  "rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white";
 
 function ChipRow({ tags }: { tags: string[] }) {
   if (tags.length === 0) return <span className="text-neutral-400">None set</span>;

@@ -124,7 +124,7 @@ export function ChatClient({
             key={i}
             className={
               m.role === "user"
-                ? "self-end rounded-2xl bg-neutral-900 px-4 py-2 text-sm text-white dark:bg-white dark:text-neutral-900"
+                ? "self-end rounded-2xl bg-accent-600 px-4 py-2 text-sm text-white dark:bg-accent-400 dark:text-white"
                 : "self-start whitespace-pre-wrap rounded-2xl bg-neutral-100 px-4 py-2 text-sm dark:bg-neutral-800"
             }
           >
@@ -145,7 +145,7 @@ export function ChatClient({
           <button
             onClick={handleSave}
             disabled={saving}
-            className="rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-neutral-900"
+            className="rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white"
           >
             {saving ? "Saving..." : "Save this recipe"}
           </button>
@@ -168,7 +168,7 @@ export function ChatClient({
         <button
           type="submit"
           disabled={sending}
-          className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-neutral-900"
+          className="rounded-md bg-accent-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white"
         >
           Send
         </button>
