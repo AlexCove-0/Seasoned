@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { sendMagicLink } from "./actions";
+import { sendMagicLink, verifyCode } from "./actions";
 
 function GoogleIcon() {
   return (
@@ -32,6 +32,9 @@ export default function LoginPage() {
     error: null,
     sent: false,
   });
+  const [verifyState, verifyFormAction, verifyPending] = useActionState(verifyCode, {
+    error: null,
+  });
   const [googleLoading, setGoogleLoading] = useState(false);
   const [googleError, setGoogleError] = useState<string | null>(null);
 
@@ -60,9 +63,38 @@ export default function LoginPage() {
       </div>
 
       {state.sent ? (
-        <p className="rounded-md border border-green-600/30 bg-green-600/10 p-3 text-sm">
-          Check your email for a sign-in link.
-        </p>
+        <div className="flex flex-col gap-3">
+          <p className="rounded-md border border-green-600/30 bg-green-600/10 p-3 text-sm">
+            We sent a 6-digit code to {state.email}. Enter it below — no need to leave this page.
+          </p>
+          <form action={verifyFormAction} className="flex flex-col gap-3">
+            <input type="hidden" name="email" value={state.email} />
+            <input
+              type="text"
+              name="token"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              required
+              placeholder="12345678"
+              className="rounded-md border border-neutral-300 px-3 py-2 text-center text-lg tracking-widest dark:border-neutral-700 dark:bg-neutral-900"
+            />
+            <button
+              type="submit"
+              disabled={verifyPending}
+              className="rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white"
+            >
+              {verifyPending ? "Verifying..." : "Verify & sign in"}
+            </button>
+            {verifyState.error ? <p className="text-sm text-red-600">{verifyState.error}</p> : null}
+          </form>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="self-start text-xs text-neutral-500 underline"
+          >
+            Use a different email
+          </button>
+        </div>
       ) : (
         <div className="flex flex-col gap-4">
           <button
@@ -95,7 +127,7 @@ export default function LoginPage() {
               disabled={pending}
               className="rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white"
             >
-              {pending ? "Sending..." : "Send sign-in link"}
+              {pending ? "Sending..." : "Email me a code"}
             </button>
             {state.error ? (
               <p className="text-sm text-red-600">{state.error}</p>

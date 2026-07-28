@@ -1,11 +1,11 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export async function sendMagicLink(
-  _prevState: { error: string | null; sent: boolean },
-  formData: FormData,
-) {
+type SendState = { error: string | null; sent: boolean; email?: string };
+
+export async function sendMagicLink(_prevState: SendState, formData: FormData): Promise<SendState> {
   const email = String(formData.get("email") ?? "").trim();
   if (!email) {
     return { error: "Enter an email address.", sent: false };
@@ -22,5 +22,23 @@ export async function sendMagicLink(
   if (error) {
     return { error: error.message, sent: false };
   }
-  return { error: null, sent: true };
+  return { error: null, sent: true, email };
+}
+
+type VerifyState = { error: string | null };
+
+export async function verifyCode(_prevState: VerifyState, formData: FormData): Promise<VerifyState> {
+  const email = String(formData.get("email") ?? "").trim();
+  const token = String(formData.get("token") ?? "").trim();
+  if (!token) {
+    return { error: "Enter the code from your email." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.verifyOtp({ email, token, type: "email" });
+
+  if (error) {
+    return { error: error.message };
+  }
+  redirect("/");
 }
