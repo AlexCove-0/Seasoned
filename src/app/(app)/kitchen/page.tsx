@@ -18,6 +18,15 @@ export type Member = {
   invite_token: string;
 };
 
+export type ConnectedProfile = {
+  user_id: string;
+  display_name: string;
+  taste_preferences: string[];
+  disliked_tastes: string[];
+  allergies: string[];
+  is_favorite: boolean;
+};
+
 export default async function KitchenPage() {
   const supabase = await createClient();
   const {
@@ -43,11 +52,31 @@ export default async function KitchenPage() {
     .eq("id", household.id)
     .single<{ appliances: string[]; pantry_staples: string[] }>();
 
+  // RLS on profiles only exposes rows shared with this user (plus their
+  // own, excluded here) -- so this select IS the dining-room connection list.
+  const { data: sharedProfiles } = await supabase
+    .from("profiles")
+    .select("user_id, display_name, taste_preferences, disliked_tastes, allergies")
+    .neq("user_id", user.id)
+    .returns<Omit<ConnectedProfile, "is_favorite">[]>();
+
+  const { data: entries } = await supabase
+    .from("dining_room_entries")
+    .select("profile_user_id, is_favorite")
+    .eq("household_id", household.id)
+    .returns<{ profile_user_id: string; is_favorite: boolean }[]>();
+
+  const favoriteByUser = new Map((entries ?? []).map((e) => [e.profile_user_id, e.is_favorite]));
+  const connected: ConnectedProfile[] = (sharedProfiles ?? []).map((p) => ({
+    ...p,
+    is_favorite: favoriteByUser.get(p.user_id) ?? false,
+  }));
+
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-10 px-4 py-10">
       <HouseholdNameEditor name={household.name} />
 
-      <ProfilesSection members={members ?? []} />
+      <ProfilesSection members={members ?? []} connected={connected} />
 
       <InviteSection householdName={household.name} inviteCode={household.invite_code} />
 

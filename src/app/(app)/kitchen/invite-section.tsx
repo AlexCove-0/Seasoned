@@ -42,8 +42,9 @@ export function InviteSection({
         </span>
       </div>
       <p className="text-sm text-neutral-500">
-        Anyone with this code can join {householdName} — they&apos;ll sign in with Google, pick or
-        create their profile, and land right here with you.
+        Send this to someone you cook for. They&apos;ll sign in with Google and create their own
+        taste profile — it shows up in your dining room, yours shows up in theirs, and their
+        updates reach you automatically.
       </p>
       <button
         type="button"

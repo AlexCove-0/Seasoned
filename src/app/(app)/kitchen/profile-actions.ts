@@ -59,6 +59,27 @@ export async function updatePerson(_prevState: State, formData: FormData): Promi
 
   if (error) return { error: error.message };
 
+  // If this member row is the signed-in user's own, write through to the
+  // canonical shared profile so connected households see the update too.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { data: memberRow } = await supabase
+    .from("household_members")
+    .select("user_id")
+    .eq("id", memberId)
+    .maybeSingle<{ user_id: string | null }>();
+  if (user && memberRow?.user_id === user.id) {
+    await supabase.from("profiles").upsert({
+      user_id: user.id,
+      display_name: displayName,
+      taste_preferences: tastePreferences,
+      disliked_tastes: dislikedTastes,
+      allergies,
+      updated_at: new Date().toISOString(),
+    });
+  }
+
   revalidatePath("/kitchen");
   return { error: null };
 }

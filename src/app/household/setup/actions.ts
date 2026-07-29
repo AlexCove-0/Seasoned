@@ -92,6 +92,49 @@ export async function joinHousehold(
   redirect("/profile/setup");
 }
 
+type ConnectState = { error: string | null; connected?: boolean };
+
+/**
+ * Invite-accept step 1: the invited person creates their OWN canonical
+ * profile, then the mutual profile-share with the inviting household is
+ * established. Kitchen membership is a separate, later choice.
+ */
+export async function createProfileAndConnect(
+  _prevState: ConnectState,
+  formData: FormData,
+): Promise<ConnectState> {
+  const inviteCode = String(formData.get("inviteCode") ?? "").trim().toUpperCase();
+  const displayName = String(formData.get("displayName") ?? "").trim();
+  if (!inviteCode || !displayName) return { error: "Enter your name." };
+
+  const tastePreferences = formData.getAll("tastePreferences").map(String);
+  const dislikedTastes = formData.getAll("dislikedTastes").map(String);
+  const allergies = formData.getAll("allergies").map(String);
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "You're not signed in." };
+
+  const { error: profileError } = await supabase.from("profiles").upsert({
+    user_id: user.id,
+    display_name: displayName,
+    taste_preferences: tastePreferences,
+    disliked_tastes: dislikedTastes,
+    allergies,
+    updated_at: new Date().toISOString(),
+  });
+  if (profileError) return { error: profileError.message };
+
+  const { error: connectError } = await supabase.rpc("connect_via_invite_code", {
+    p_invite_code: inviteCode,
+  });
+  if (connectError) return { error: connectError.message };
+
+  return { error: null, connected: true };
+}
+
 export type UnclaimedProfile = { id: string; display_name: string };
 
 export async function lookupUnclaimedProfiles(

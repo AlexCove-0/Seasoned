@@ -31,5 +31,17 @@ export async function saveProfile(_prevState: State, formData: FormData): Promis
 
   if (error) return { error: error.message };
 
+  // Keep the canonical shared profile in sync -- this is the copy that
+  // everyone this user is connected with actually reads.
+  const { error: profileError } = await supabase.from("profiles").upsert({
+    user_id: user.id,
+    display_name: displayName,
+    taste_preferences: tastePreferences,
+    disliked_tastes: dislikedTastes,
+    allergies,
+    updated_at: new Date().toISOString(),
+  });
+  if (profileError) return { error: profileError.message };
+
   redirect("/");
 }

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
-import { HouseholdSetupForms } from "./forms";
+import { HouseholdSetupForms, InviteAcceptFlow } from "./forms";
 
 export default async function HouseholdSetupPage({
   searchParams,
@@ -24,6 +24,21 @@ export default async function HouseholdSetupPage({
   const existing = await getCurrentHousehold();
   if (existing) redirect("/");
 
+  if (code) {
+    return (
+      <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-8 px-4 py-10">
+        <div>
+          <h1 className="text-2xl font-semibold">You&apos;re invited!</h1>
+          <p className="text-sm text-neutral-500">
+            Tell us what you like to eat — your profile stays yours, and whoever invited you will
+            see it in their dining room so meals lean toward what you actually like.
+          </p>
+        </div>
+        <InviteAcceptFlow code={code.toUpperCase()} />
+      </main>
+    );
+  }
+
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-8 px-4">
       <div>
@@ -33,7 +48,7 @@ export default async function HouseholdSetupPage({
           invited to.
         </p>
       </div>
-      <HouseholdSetupForms defaultCode={code ?? null} />
+      <HouseholdSetupForms defaultCode={null} />
     </main>
   );
 }

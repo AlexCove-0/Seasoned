@@ -1,7 +1,16 @@
 "use client";
 
 import { useActionState, useState, useTransition } from "react";
-import { createHousehold, joinHousehold, lookupUnclaimedProfiles, claimProfile } from "./actions";
+import { TagPicker } from "@/components/tag-picker";
+import { TastePicker } from "@/components/taste-picker";
+import { TASTE_PREFERENCES, COMMON_ALLERGENS } from "@/lib/taste-options";
+import {
+  createHousehold,
+  createProfileAndConnect,
+  joinHousehold,
+  lookupUnclaimedProfiles,
+  claimProfile,
+} from "./actions";
 import type { UnclaimedProfile } from "./actions";
 
 const inputClass =
@@ -9,13 +18,98 @@ const inputClass =
 const buttonClass =
   "rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white";
 
+/**
+ * The flow behind an invite link: create YOUR profile first (it gets
+ * shared with the inviter's household and theirs with you), then decide
+ * where your own recipes live -- a new kitchen, or theirs if you
+ * actually share one.
+ */
+export function InviteAcceptFlow({ code }: { code: string }) {
+  const [state, formAction, pending] = useActionState(createProfileAndConnect, { error: null });
+  const [kitchenChoice, setKitchenChoice] = useState<"own" | "theirs" | null>(null);
+
+  if (!state.connected) {
+    return (
+      <form action={formAction} className="flex flex-col gap-4">
+        <input type="hidden" name="inviteCode" value={code} />
+        <label className="flex flex-col gap-1 text-sm">
+          Your name
+          <input name="displayName" required placeholder="Your name" className={inputClass} />
+        </label>
+        <TastePicker
+          likedName="tastePreferences"
+          dislikedName="dislikedTastes"
+          label="Taste preferences"
+          suggestions={TASTE_PREFERENCES}
+        />
+        <TagPicker name="allergies" label="Food allergies" suggestions={COMMON_ALLERGENS} />
+        <button type="submit" disabled={pending} className={buttonClass}>
+          {pending ? "Saving..." : "Save my profile"}
+        </button>
+        {state.error ? <p className="text-sm text-red-600">{state.error}</p> : null}
+      </form>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <p className="rounded-md border border-green-600/30 bg-green-600/10 p-3 text-sm">
+        You&apos;re connected! Your taste profile is now in their dining room, and theirs is in
+        yours. One last thing — where should your own recipes live?
+      </p>
+
+      {kitchenChoice === null ? (
+        <div className="flex flex-col gap-2">
+          <button type="button" onClick={() => setKitchenChoice("own")} className={buttonClass}>
+            Set up my own kitchen
+          </button>
+          <button
+            type="button"
+            onClick={() => setKitchenChoice("theirs")}
+            className="rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium dark:border-neutral-700"
+          >
+            I live with them — join their kitchen
+          </button>
+        </div>
+      ) : kitchenChoice === "own" ? (
+        <CreateHouseholdForm />
+      ) : (
+        <JoinHouseholdForm defaultCode={code} />
+      )}
+    </div>
+  );
+}
+
+function CreateHouseholdForm() {
+  const [createState, createAction, createPending] = useActionState(createHousehold, {
+    error: null,
+  });
+
+  return (
+    <form action={createAction} className="flex flex-col gap-3">
+      <label className="flex flex-col gap-1 text-sm">
+        Household name
+        <input
+          name="householdName"
+          required
+          placeholder="The Calvarado Kitchen"
+          className={inputClass}
+        />
+      </label>
+      <label className="flex flex-col gap-1 text-sm">
+        Your name
+        <input name="displayName" required placeholder="Alex" className={inputClass} />
+      </label>
+      <button type="submit" disabled={createPending} className={buttonClass}>
+        {createPending ? "Creating..." : "Create household"}
+      </button>
+      {createState.error ? <p className="text-sm text-red-600">{createState.error}</p> : null}
+    </form>
+  );
+}
+
 export function HouseholdSetupForms({ defaultCode }: { defaultCode: string | null }) {
   const [mode, setMode] = useState<"create" | "join">(defaultCode ? "join" : "create");
-
-  const [createState, createAction, createPending] = useActionState(
-    createHousehold,
-    { error: null },
-  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -37,31 +131,7 @@ export function HouseholdSetupForms({ defaultCode }: { defaultCode: string | nul
         </button>
       </div>
 
-      {mode === "create" ? (
-        <form action={createAction} className="flex flex-col gap-3">
-          <label className="flex flex-col gap-1 text-sm">
-            Household name
-            <input
-              name="householdName"
-              required
-              placeholder="The Calvarado Kitchen"
-              className={inputClass}
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm">
-            Your name
-            <input name="displayName" required placeholder="Alex" className={inputClass} />
-          </label>
-          <button type="submit" disabled={createPending} className={buttonClass}>
-            {createPending ? "Creating..." : "Create household"}
-          </button>
-          {createState.error ? (
-            <p className="text-sm text-red-600">{createState.error}</p>
-          ) : null}
-        </form>
-      ) : (
-        <JoinHouseholdForm defaultCode={defaultCode} />
-      )}
+      {mode === "create" ? <CreateHouseholdForm /> : <JoinHouseholdForm defaultCode={defaultCode} />}
     </div>
   );
 }
