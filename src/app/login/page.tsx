@@ -34,9 +34,14 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     const supabase = createClient();
+    // Carry a ?next= destination (e.g. an invite's join link) through the
+    // OAuth round trip; /auth/confirm redirects there after sign-in.
+    const next = new URLSearchParams(window.location.search).get("next") ?? "/";
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/confirm?next=/` },
+      options: {
+        redirectTo: `${window.location.origin}/auth/confirm?next=${encodeURIComponent(next)}`,
+      },
     });
     if (error) {
       setError(error.message);

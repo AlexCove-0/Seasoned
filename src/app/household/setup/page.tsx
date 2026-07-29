@@ -3,12 +3,23 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
 import { HouseholdSetupForms } from "./forms";
 
-export default async function HouseholdSetupPage() {
+export default async function HouseholdSetupPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ code?: string }>;
+}) {
+  const { code } = await searchParams;
+
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    // Keep the invite code through the sign-in round trip so the person
+    // lands back here with it prefilled.
+    const next = code ? `/household/setup?code=${encodeURIComponent(code)}` : "/household/setup";
+    redirect(`/login?next=${encodeURIComponent(next)}`);
+  }
 
   const existing = await getCurrentHousehold();
   if (existing) redirect("/");
@@ -22,7 +33,7 @@ export default async function HouseholdSetupPage() {
           invited to.
         </p>
       </div>
-      <HouseholdSetupForms />
+      <HouseholdSetupForms defaultCode={code ?? null} />
     </main>
   );
 }

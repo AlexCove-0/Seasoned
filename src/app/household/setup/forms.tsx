@@ -9,8 +9,8 @@ const inputClass =
 const buttonClass =
   "rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white";
 
-export function HouseholdSetupForms() {
-  const [mode, setMode] = useState<"create" | "join">("create");
+export function HouseholdSetupForms({ defaultCode }: { defaultCode: string | null }) {
+  const [mode, setMode] = useState<"create" | "join">(defaultCode ? "join" : "create");
 
   const [createState, createAction, createPending] = useActionState(
     createHousehold,
@@ -60,14 +60,14 @@ export function HouseholdSetupForms() {
           ) : null}
         </form>
       ) : (
-        <JoinHouseholdForm />
+        <JoinHouseholdForm defaultCode={defaultCode} />
       )}
     </div>
   );
 }
 
-function JoinHouseholdForm() {
-  const [inviteCode, setInviteCode] = useState("");
+function JoinHouseholdForm({ defaultCode }: { defaultCode: string | null }) {
+  const [inviteCode, setInviteCode] = useState(defaultCode ?? "");
   const [checked, setChecked] = useState(false);
   const [profiles, setProfiles] = useState<UnclaimedProfile[]>([]);
   const [claimingAsNew, setClaimingAsNew] = useState(false);

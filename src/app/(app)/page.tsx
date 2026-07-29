@@ -35,10 +35,7 @@ export default async function Home() {
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-8 px-4 py-10">
       <header>
         <h1 className="text-2xl font-semibold">{household.name}</h1>
-        <p className="text-sm text-neutral-500">
-          Signed in as {household.display_name} &middot; invite code{" "}
-          <span className="font-mono">{household.invite_code}</span>
-        </p>
+        <p className="text-sm text-neutral-500">Signed in as {household.display_name}</p>
       </header>
 
       <div className="flex gap-2">

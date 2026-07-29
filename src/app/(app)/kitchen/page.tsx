@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
 import { HouseholdNameEditor } from "./household-name-editor";
+import { InviteSection } from "./invite-section";
 import { ProfilesSection } from "./profiles-section";
 import { AppliancesForm } from "./appliances-form";
 import { PantryStaplesForm } from "./pantry-staples-form";
@@ -47,6 +48,8 @@ export default async function KitchenPage() {
       <HouseholdNameEditor name={household.name} />
 
       <ProfilesSection members={members ?? []} />
+
+      <InviteSection householdName={household.name} inviteCode={household.invite_code} />
 
       <section className="flex flex-col gap-6">
         <h2 className="text-lg font-medium">Kitchen Settings</h2>
