@@ -1,8 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { sendMagicLink, verifyCode } from "./actions";
 
 function GoogleIcon() {
   return (
@@ -28,27 +27,20 @@ function GoogleIcon() {
 }
 
 export default function LoginPage() {
-  const [state, formAction, pending] = useActionState(sendMagicLink, {
-    error: null,
-    sent: false,
-  });
-  const [verifyState, verifyFormAction, verifyPending] = useActionState(verifyCode, {
-    error: null,
-  });
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const [googleError, setGoogleError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function signInWithGoogle() {
-    setGoogleLoading(true);
-    setGoogleError(null);
+    setLoading(true);
+    setError(null);
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/auth/confirm?next=/` },
     });
     if (error) {
-      setGoogleError(error.message);
-      setGoogleLoading(false);
+      setError(error.message);
+      setLoading(false);
     }
     // On success the browser navigates away to Google, so nothing left to do here.
   }
@@ -57,84 +49,19 @@ export default function LoginPage() {
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4">
       <div>
         <h1 className="text-2xl font-semibold">Seasoned</h1>
-        <p className="text-sm text-neutral-500">
-          Your personal chef instructor. No password needed.
-        </p>
+        <p className="text-sm text-neutral-500">Your personal chef instructor.</p>
       </div>
 
-      {state.sent ? (
-        <div className="flex flex-col gap-3">
-          <p className="rounded-md border border-green-600/30 bg-green-600/10 p-3 text-sm">
-            We sent a 6-digit code to {state.email}. Enter it below — no need to leave this page.
-          </p>
-          <form action={verifyFormAction} className="flex flex-col gap-3">
-            <input type="hidden" name="email" value={state.email} />
-            <input
-              type="text"
-              name="token"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              required
-              placeholder="12345678"
-              className="rounded-md border border-neutral-300 px-3 py-2 text-center text-lg tracking-widest dark:border-neutral-700 dark:bg-neutral-900"
-            />
-            <button
-              type="submit"
-              disabled={verifyPending}
-              className="rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white"
-            >
-              {verifyPending ? "Verifying..." : "Verify & sign in"}
-            </button>
-            {verifyState.error ? <p className="text-sm text-red-600">{verifyState.error}</p> : null}
-          </form>
-          <button
-            type="button"
-            onClick={() => window.location.reload()}
-            className="self-start text-xs text-neutral-500 underline"
-          >
-            Use a different email
-          </button>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-4">
-          <button
-            type="button"
-            onClick={signInWithGoogle}
-            disabled={googleLoading}
-            className="flex items-center justify-center gap-2 rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium disabled:opacity-50 dark:border-neutral-700"
-          >
-            <GoogleIcon />
-            {googleLoading ? "Redirecting..." : "Continue with Google"}
-          </button>
-          {googleError ? <p className="text-sm text-red-600">{googleError}</p> : null}
-
-          <div className="flex items-center gap-3 text-xs text-neutral-400">
-            <span className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
-            or
-            <span className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
-          </div>
-
-          <form action={formAction} className="flex flex-col gap-3">
-            <input
-              type="email"
-              name="email"
-              required
-              placeholder="you@example.com"
-              className="rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-            />
-            <button
-              type="submit"
-              disabled={pending}
-              className="rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white"
-            >
-              {pending ? "Sending..." : "Email me a code"}
-            </button>
-            {state.error ? (
-              <p className="text-sm text-red-600">{state.error}</p>
-            ) : null}
-          </form>
-        </div>
-      )}
+      <button
+        type="button"
+        onClick={signInWithGoogle}
+        disabled={loading}
+        className="flex items-center justify-center gap-2 rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium disabled:opacity-50 dark:border-neutral-700"
+      >
+        <GoogleIcon />
+        {loading ? "Redirecting..." : "Continue with Google"}
+      </button>
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
     </main>
   );
 }
