@@ -40,16 +40,18 @@ export async function POST(request: Request) {
     taste_preferences: string[];
     disliked_tastes: string[];
     allergies: string[];
+    flavor_axes: Record<string, number> | null;
+    texture_flags: string[] | null;
   }[] = [];
 
   if (Array.isArray(body.dinerIds) && body.dinerIds.length > 0) {
     const { data } = await supabase
       .from("household_members")
-      .select("display_name, taste_preferences, disliked_tastes, allergies")
+      .select("display_name, taste_preferences, disliked_tastes, allergies, flavor_axes, texture_flags")
       .eq("household_id", household.id)
       .in("id", body.dinerIds)
       .returns<
-        { display_name: string; taste_preferences: string[]; disliked_tastes: string[]; allergies: string[] }[]
+        { display_name: string; taste_preferences: string[]; disliked_tastes: string[]; allergies: string[]; flavor_axes: Record<string, number> | null; texture_flags: string[] | null }[]
       >();
     diners = data ?? [];
   }

@@ -58,6 +58,16 @@ export function InviteAcceptFlow({ code }: { code: string }) {
         yours. One last thing — where should your own recipes live?
       </p>
 
+      <a
+        href="/quiz?next=/household/setup"
+        className="rounded-lg bg-accent-50 px-3 py-2.5 text-sm text-accent-600 dark:bg-accent-950 dark:text-accent-400"
+      >
+        Take the flavor quiz &rarr;{" "}
+        <span className="text-neutral-500">
+          2 minutes, and every recipe gets sharper. You can always do it later.
+        </span>
+      </a>
+
       {kitchenChoice === null ? (
         <div className="flex flex-col gap-2">
           <button type="button" onClick={() => setKitchenChoice("own")} className={buttonClass}>

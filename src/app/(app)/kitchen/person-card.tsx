@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useEffect, useState, useTransition } from "react";
 import { TagPicker } from "@/components/tag-picker";
 import { TastePicker } from "@/components/taste-picker";
 import { TASTE_PREFERENCES, COMMON_ALLERGENS } from "@/lib/taste-options";
+import { monthsSince, STALE_AFTER_MONTHS } from "@/lib/flavor/scoring";
 import { updatePerson, toggleFavorite } from "./profile-actions";
 import type { Member } from "./page";
 
@@ -19,6 +21,44 @@ const chipColorClass: Record<ChipColor, string> = {
   red: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
   yellow: "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300",
 };
+
+function FlavorQuizRow({
+  memberId,
+  hasProfile,
+  takenAt,
+}: {
+  memberId: string;
+  hasProfile: boolean;
+  takenAt: string | null;
+}) {
+  const age = monthsSince(takenAt);
+  const stale = age !== null && age >= STALE_AFTER_MONTHS;
+  const href = `/quiz?member=${memberId}&next=/kitchen`;
+
+  if (!hasProfile) {
+    return (
+      <Link
+        href={href}
+        className="mb-2 block rounded-lg bg-accent-50 px-3 py-2 text-xs text-accent-600 dark:bg-accent-950 dark:text-accent-400"
+      >
+        Take the flavor quiz &rarr;{" "}
+        <span className="text-neutral-500">2 minutes, sharpens every recipe</span>
+      </Link>
+    );
+  }
+
+  return (
+    <div className="mb-2 flex items-center gap-2 text-xs text-neutral-500">
+      <span>
+        Flavor profile
+        {age !== null ? ` · ${age < 1 ? "just taken" : `${age} mo ago`}` : ""}
+      </span>
+      <Link href={href} className="underline underline-offset-2 hover:text-neutral-900 dark:hover:text-white">
+        {stale ? "Tastes changed? Retake" : "Retake"}
+      </Link>
+    </div>
+  );
+}
 
 function ChipRow({ tags, color }: { tags: string[]; color: ChipColor }) {
   if (tags.length === 0) return <span className="text-neutral-400">None set</span>;
@@ -80,6 +120,11 @@ export function PersonCard({ member }: { member: Member }) {
               {member.is_favorite ? "★" : "☆"}
             </button>
             {member.display_name}
+            {member.flavor_archetype ? (
+              <span className="rounded-full bg-accent-50 px-2 py-0.5 text-xs font-normal text-accent-600 dark:bg-accent-950 dark:text-accent-400">
+                {member.flavor_archetype}
+              </span>
+            ) : null}
           </span>
           <div className="flex items-center gap-3">
             {!member.user_id ? (
@@ -100,6 +145,11 @@ export function PersonCard({ member }: { member: Member }) {
             </button>
           </div>
         </div>
+        <FlavorQuizRow
+          memberId={member.id}
+          hasProfile={Boolean(member.flavor_archetype)}
+          takenAt={member.quiz_taken_at}
+        />
         <dl className="flex flex-col gap-1.5">
           <div className="flex gap-2">
             <dt className="w-24 shrink-0 text-neutral-500">Likes</dt>

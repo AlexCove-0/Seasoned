@@ -1,8 +1,13 @@
+import { describeAxes } from "@/lib/flavor/scoring";
+import type { FlavorAxes } from "@/lib/flavor/axes";
+
 type Diner = {
   display_name: string;
   taste_preferences: string[];
   disliked_tastes: string[];
   allergies: string[];
+  flavor_axes?: FlavorAxes | null;
+  texture_flags?: string[] | null;
 };
 
 type SessionContext = {
@@ -57,6 +62,16 @@ export function buildDinerContext({
       if (d.disliked_tastes.length > 0) parts.push(`dislikes ${d.disliked_tastes.join(", ")}`);
       if (d.allergies.length > 0) parts.push(`ALLERGIC TO: ${d.allergies.join(", ")}`);
       lines.push(`- ${d.display_name}${parts.length > 0 ? ` — ${parts.join("; ")}` : " — no preferences set"}`);
+
+      // Flavor-quiz axes give calibrated intensity, which is far more useful
+      // than tags: they say HOW MUCH acid or richness to reach for, rather
+      // than merely that someone "likes tangy".
+      for (const phrase of describeAxes(d.flavor_axes ?? null)) {
+        lines.push(`    · ${phrase}`);
+      }
+      if (d.texture_flags && d.texture_flags.length > 0) {
+        lines.push(`    · texture notes: ${d.texture_flags.join(", ")}`);
+      }
     }
     const allAllergies = [...new Set(diners.flatMap((d) => d.allergies))];
     if (allAllergies.length > 0) {
