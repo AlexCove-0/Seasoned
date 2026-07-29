@@ -44,7 +44,7 @@ export function HouseholdNameEditor({ name }: { name: string }) {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         autoFocus
-        className="rounded-md border border-neutral-300 px-2 py-1 text-xl font-semibold dark:border-neutral-700 dark:bg-neutral-900"
+        className="rounded-lg bg-neutral-100 px-3 py-1.5 text-xl font-semibold tracking-tight focus:ring-2 focus:ring-accent-600/30 focus:outline-none dark:bg-neutral-900"
       />
       <button
         type="submit"

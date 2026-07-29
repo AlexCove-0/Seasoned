@@ -29,7 +29,7 @@ export function ConnectedProfileCard({ profile }: { profile: ConnectedProfile })
   const [favoritePending, startFavoriteTransition] = useTransition();
 
   return (
-    <div className="rounded-lg border border-neutral-200 p-4 text-sm dark:border-neutral-800">
+    <div className="rounded-xl bg-neutral-100 p-4 text-sm dark:bg-neutral-900">
       <div className="mb-2 flex items-center justify-between">
         <span className="flex items-center gap-1.5 font-medium">
           <button

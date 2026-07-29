@@ -7,7 +7,7 @@ import { TASTE_PREFERENCES, COMMON_ALLERGENS } from "@/lib/taste-options";
 import { addPerson } from "./profile-actions";
 
 const inputClass =
-  "rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900";
+  "rounded-lg bg-neutral-100 px-3 py-2.5 text-sm placeholder:text-neutral-400 focus:ring-2 focus:ring-accent-600/30 focus:outline-none dark:bg-neutral-900";
 const buttonClass =
   "rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white";
 
@@ -41,7 +41,7 @@ export function AddPersonForm() {
     <form
       key={formKey}
       action={formAction}
-      className="flex flex-col gap-4 rounded-lg border border-neutral-300 p-4 dark:border-neutral-700"
+      className="flex flex-col gap-4 rounded-xl p-4 ring-1 ring-neutral-200 dark:ring-neutral-800"
     >
       <label className="flex flex-col gap-1 text-sm">
         Name

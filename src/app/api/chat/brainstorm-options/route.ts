@@ -24,9 +24,9 @@ export async function POST(request: Request) {
 
   const { data: householdRow } = await supabase
     .from("households")
-    .select("appliances")
+    .select("appliances, pantry_staples")
     .eq("id", household.id)
-    .single<{ appliances: string[] }>();
+    .single<{ appliances: string[]; pantry_staples: string[] }>();
 
   let diners: {
     display_name: string;
@@ -55,6 +55,7 @@ export async function POST(request: Request) {
     regionalTwist: Array.isArray(body.regionalTwist) ? body.regionalTwist : [],
     ingredientsOnHand: Array.isArray(body.ingredientsOnHand) ? body.ingredientsOnHand : [],
     appliances: householdRow?.appliances ?? [],
+    pantryStaples: householdRow?.pantry_staples ?? [],
   });
   const system = context ? `${RECIPE_OPTIONS_PROMPT}\n\n${context}` : RECIPE_OPTIONS_PROMPT;
 

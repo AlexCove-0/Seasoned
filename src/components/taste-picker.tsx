@@ -104,7 +104,7 @@ export function TastePicker({
           }
         }}
         placeholder="Type to search or add your own..."
-        className="rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"
+        className="rounded-lg bg-neutral-100 px-3 py-2.5 text-sm placeholder:text-neutral-400 focus:ring-2 focus:ring-accent-600/30 focus:outline-none dark:bg-neutral-900"
       />
 
       {remaining.length > 0 ? (
@@ -112,7 +112,7 @@ export function TastePicker({
           {remaining.map((s) => (
             <span
               key={s}
-              className="flex items-stretch overflow-hidden rounded-full border border-neutral-300 dark:border-neutral-700"
+              className="flex items-stretch overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-900"
             >
               <button
                 type="button"

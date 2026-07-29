@@ -34,22 +34,22 @@ export default async function Home() {
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-8 px-4 py-10">
       <header>
-        <h1 className="text-2xl font-semibold">{household.name}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{household.name}</h1>
         <p className="text-sm text-neutral-500">Signed in as {household.display_name}</p>
       </header>
 
       <div className="flex gap-2">
         <Link
           href="/chat"
-          className="flex-1 rounded-md bg-accent-600 px-4 py-3 text-center text-sm font-medium text-white dark:bg-accent-400 dark:text-white"
+          className="flex-[2] rounded-xl bg-accent-600 px-4 py-3.5 text-center text-sm font-semibold text-white dark:bg-accent-400"
         >
           Cook up a new recipe
         </Link>
         <Link
           href="/import"
-          className="flex-1 rounded-md border border-neutral-300 px-4 py-3 text-center text-sm font-medium dark:border-neutral-700"
+          className="flex-1 rounded-xl bg-neutral-100 px-4 py-3.5 text-center text-sm font-medium transition-colors hover:bg-neutral-200 dark:bg-neutral-900 dark:hover:bg-neutral-800"
         >
-          Import a recipe
+          Import
         </Link>
       </div>
 
@@ -66,7 +66,9 @@ export default async function Home() {
       />
 
       <section>
-        <h2 className="mb-2 text-lg font-medium">Your recipes</h2>
+        <h2 className="mb-2.5 text-[11px] font-semibold tracking-[0.12em] text-neutral-500 uppercase">
+          Your recipes
+        </h2>
         {!recipes || recipes.length === 0 ? (
           <p className="text-sm text-neutral-500">
             Nothing saved yet — start a conversation above.

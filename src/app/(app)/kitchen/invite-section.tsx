@@ -59,7 +59,7 @@ export function InviteSection({
           value={fallbackText}
           onFocus={(e) => e.currentTarget.select()}
           rows={3}
-          className="rounded-md border border-neutral-300 bg-white px-3 py-2 text-xs dark:border-neutral-700 dark:bg-neutral-800"
+          className="rounded-lg bg-white px-3 py-2 text-xs dark:bg-neutral-800"
         />
       ) : null}
     </section>

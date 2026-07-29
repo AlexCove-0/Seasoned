@@ -23,9 +23,11 @@ export function ProfilesSection({
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-medium">My Dining Room</h2>
-        <p className="text-xs text-neutral-500">
+      <div>
+        <h2 className="text-[11px] font-semibold tracking-[0.12em] text-neutral-500 uppercase">
+          My Dining Room
+        </h2>
+        <p className="mt-1 text-xs text-neutral-500">
           Everyone you might cook for. Favorites show up by default.
         </p>
       </div>
@@ -54,7 +56,7 @@ export function ProfilesSection({
             <button
               type="button"
               onClick={() => setShowAll(true)}
-              className="self-start rounded-full border border-neutral-300 px-3 py-1 text-xs text-neutral-500 hover:border-neutral-500 hover:text-neutral-900 dark:border-neutral-700 dark:hover:text-white"
+              className="self-start rounded-full bg-neutral-100 px-3 py-1.5 text-xs text-neutral-500 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-white"
             >
               + {hiddenCount} more {hiddenCount === 1 ? "profile" : "profiles"}
             </button>

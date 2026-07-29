@@ -35,18 +35,20 @@ export default async function ChatPage() {
     .eq("id", household.id)
     .single<{ pantry_staples: string[] }>();
 
-  // Case-insensitive dedup, keeping whichever casing is seen first -- pantry
-  // staples and the common list are properly cased, so they win over
-  // however someone happened to type something into "ingredients on hand"
-  // in the past.
+  // "On hand" means what you're actually planning to cook with tonight --
+  // the protein, the vegetables you just bought. Pantry staples are givens
+  // that are always in the kitchen, so suggesting them here is noise; they
+  // reach the chef separately as assumed-available.
+  const staples = new Set((householdRow?.pantry_staples ?? []).map((s) => s.toLowerCase()));
+
+  // Case-insensitive dedup, keeping whichever casing is seen first -- the
+  // common list is properly cased, so it wins over however someone happened
+  // to type something into "on hand" in the past.
   const seen = new Map<string, string>();
-  for (const name of [
-    ...(householdRow?.pantry_staples ?? []),
-    ...COMMON_INGREDIENTS,
-    ...(topIngredients ?? []).map((i) => i.name),
-  ]) {
+  for (const name of [...COMMON_INGREDIENTS, ...(topIngredients ?? []).map((i) => i.name)]) {
     const key = name.toLowerCase();
-    if (!seen.has(key)) seen.set(key, name);
+    if (staples.has(key) || seen.has(key)) continue;
+    seen.set(key, name);
   }
   const ingredientSuggestions = [...seen.values()];
 

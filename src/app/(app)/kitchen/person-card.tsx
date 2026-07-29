@@ -10,9 +10,9 @@ import { updatePerson, toggleFavorite } from "./profile-actions";
 import type { Member } from "./page";
 
 const inputClass =
-  "rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900";
+  "rounded-lg bg-neutral-100 px-3 py-2.5 text-sm placeholder:text-neutral-400 focus:ring-2 focus:ring-accent-600/30 focus:outline-none dark:bg-neutral-900";
 const buttonClass =
-  "rounded-md bg-accent-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white";
+  "rounded-lg bg-accent-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 dark:bg-accent-400";
 
 type ChipColor = "green" | "red" | "yellow";
 
@@ -105,7 +105,7 @@ export function PersonCard({ member }: { member: Member }) {
 
   if (!editing) {
     return (
-      <div className="rounded-lg border border-neutral-200 p-4 text-sm dark:border-neutral-800">
+      <div className="rounded-xl bg-neutral-100 p-4 text-sm dark:bg-neutral-900">
         <div className="mb-2 flex items-center justify-between">
           <span className="flex items-center gap-1.5 font-medium">
             <button
@@ -131,7 +131,7 @@ export function PersonCard({ member }: { member: Member }) {
               <button
                 type="button"
                 onClick={sendInvite}
-                className="rounded-full border border-neutral-300 px-2 py-0.5 text-xs text-neutral-500 hover:border-accent-600 hover:text-accent-600 dark:border-neutral-700 dark:hover:border-accent-400 dark:hover:text-accent-400"
+                className="rounded-full bg-neutral-200 px-2.5 py-0.5 text-xs text-neutral-600 hover:bg-accent-600 hover:text-white dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-accent-400"
               >
                 {inviteCopied ? "Link copied!" : "Send Invite"}
               </button>
@@ -177,7 +177,7 @@ export function PersonCard({ member }: { member: Member }) {
   return (
     <form
       action={formAction}
-      className="flex flex-col gap-4 rounded-lg border border-neutral-300 p-4 dark:border-neutral-700"
+      className="flex flex-col gap-4 rounded-xl p-4 ring-1 ring-neutral-200 dark:ring-neutral-800"
     >
       <input type="hidden" name="memberId" value={member.id} />
       <label className="flex flex-col gap-1 text-sm">

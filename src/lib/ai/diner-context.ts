@@ -16,6 +16,7 @@ type SessionContext = {
   regionalTwist: string[];
   ingredientsOnHand: string[];
   appliances: string[];
+  pantryStaples?: string[];
 };
 
 /**
@@ -35,6 +36,7 @@ export function buildDinerContext({
   regionalTwist,
   ingredientsOnHand,
   appliances,
+  pantryStaples = [],
 }: SessionContext): string {
   const lines: string[] = [];
 
@@ -47,7 +49,17 @@ export function buildDinerContext({
   }
 
   if (ingredientsOnHand.length > 0) {
-    lines.push(`Ingredients already on hand: ${ingredientsOnHand.join(", ")}.`);
+    lines.push(
+      `Tonight's ingredients -- what they specifically want to cook with: ${ingredientsOnHand.join(", ")}.`,
+    );
+  }
+
+  // Staples are assumed present, so the chef can call for them freely without
+  // treating them as a constraint the way tonight's ingredients are.
+  if (pantryStaples.length > 0) {
+    lines.push(
+      `Always stocked in this kitchen, use freely without asking: ${pantryStaples.join(", ")}.`,
+    );
   }
 
   if (appliances.length > 0) {

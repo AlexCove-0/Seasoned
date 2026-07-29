@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CollapsibleRow } from "@/components/collapsible-row";
 import { TagPicker } from "@/components/tag-picker";
 import { REGIONAL_CUISINES } from "@/lib/taste-options";
 
@@ -40,20 +41,21 @@ export function SessionSetup({
   const visibleMembers = showAll ? members : favorites;
 
   return (
-    <div className="flex flex-1 flex-col gap-6">
-      <div className="max-w-sm">
-        <TagPicker
-          label="Ingredients on hand"
-          suggestions={topIngredients}
-          placeholder="Type an ingredient and press Enter..."
-          onChange={setIngredientsOnHand}
-        />
+    <div className="flex flex-1 flex-col gap-7 pb-24">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Tonight&apos;s cook</h1>
+        <p className="text-sm text-neutral-500">
+          Serves {servings} &middot; {dinerIds.length || "no"}{" "}
+          {dinerIds.length === 1 ? "person" : "people"} at the table
+        </p>
       </div>
 
       {members.length > 0 ? (
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium">Cooking for</span>
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-col gap-2.5">
+          <span className="text-[11px] font-semibold tracking-[0.12em] text-neutral-500 uppercase">
+            Cooking for
+          </span>
+          <div className="flex flex-wrap items-center gap-1.5">
             {visibleMembers.map((m) => {
               const active = dinerIds.includes(m.id);
               return (
@@ -63,8 +65,8 @@ export function SessionSetup({
                   onClick={() => toggleDiner(m.id)}
                   className={
                     active
-                      ? "rounded-full bg-accent-600 px-3 py-1 text-xs text-white dark:bg-accent-400 dark:text-white"
-                      : "rounded-full border border-neutral-300 px-3 py-1 text-xs text-neutral-500 dark:border-neutral-700"
+                      ? "rounded-full bg-accent-600 px-3 py-1 text-xs font-medium text-white dark:bg-accent-400"
+                      : "rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-600 transition-colors hover:bg-neutral-200 dark:bg-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800"
                   }
                 >
                   {m.display_name}
@@ -75,45 +77,72 @@ export function SessionSetup({
               <button
                 type="button"
                 onClick={() => setShowAll(true)}
-                aria-label="Show more profiles"
-                className="rounded-full border border-dashed border-neutral-300 px-2.5 py-1 text-xs text-neutral-400 hover:border-neutral-500 hover:text-neutral-900 dark:border-neutral-700 dark:hover:text-white"
+                className="rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-500 hover:bg-neutral-200 dark:bg-neutral-900 dark:hover:bg-neutral-800"
               >
-                +
+                +{rest.length} more
               </button>
             ) : null}
           </div>
         </div>
       ) : null}
 
-      <label className="flex w-20 flex-col gap-1 text-sm">
-        <span className="font-medium">Portions</span>
-        <input
-          type="number"
-          min={1}
-          max={99}
-          value={servings}
-          onChange={(e) => setServings(Math.max(1, Number(e.target.value) || 1))}
-          className="rounded-md border border-neutral-300 px-2 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-        />
-      </label>
+      <TagPicker
+        label="On hand"
+        suggestions={topIngredients}
+        placeholder="Add an ingredient…"
+        onChange={setIngredientsOnHand}
+      />
 
-      <div className="max-w-sm">
-        <TagPicker
-          label="Regional twist (optional)"
-          suggestions={REGIONAL_CUISINES}
-          placeholder="e.g. Mexican, Chinese..."
-          onChange={setRegionalTwist}
-        />
+      <div className="flex flex-col gap-2">
+        <CollapsibleRow
+          label="Regional twist"
+          summary={regionalTwist.length > 0 ? regionalTwist.join(", ") : "Any"}
+        >
+          <TagPicker
+            suggestions={REGIONAL_CUISINES}
+            placeholder="e.g. Mexican, Chinese…"
+            onChange={setRegionalTwist}
+          />
+        </CollapsibleRow>
+
+        <div className="flex items-center justify-between rounded-xl bg-neutral-100 px-4 py-3 dark:bg-neutral-900">
+          <span className="text-sm font-medium">Portions</span>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setServings((s) => Math.max(1, s - 1))}
+              aria-label="Fewer portions"
+              className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-200 text-sm dark:bg-neutral-800"
+            >
+              &minus;
+            </button>
+            <span className="w-5 text-center text-sm font-medium tabular-nums">{servings}</span>
+            <button
+              type="button"
+              onClick={() => setServings((s) => Math.min(99, s + 1))}
+              aria-label="More portions"
+              className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-200 text-sm dark:bg-neutral-800"
+            >
+              +
+            </button>
+          </div>
+        </div>
       </div>
 
-      <button
-        type="button"
-        onClick={() => onStart({ dinerIds, servings, regionalTwist, ingredientsOnHand })}
-        disabled={starting}
-        className="self-start rounded-md bg-accent-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-accent-400 dark:text-white"
-      >
-        {starting ? "Thinking..." : "Find recipe ideas"}
-      </button>
+      {/* Pinned so the next step is always in reach instead of parked at the
+          bottom of a long scroll. */}
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-neutral-200/60 bg-neutral-50/90 px-4 py-3 backdrop-blur dark:border-neutral-800/60 dark:bg-neutral-950/90">
+        <div className="mx-auto max-w-2xl">
+          <button
+            type="button"
+            onClick={() => onStart({ dinerIds, servings, regionalTwist, ingredientsOnHand })}
+            disabled={starting}
+            className="w-full rounded-xl bg-accent-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50 dark:bg-accent-400"
+          >
+            {starting ? "Thinking…" : "Find recipe ideas"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

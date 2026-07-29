@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 
 type TagPickerProps = {
   name?: string;
-  label: string;
+  label?: string;
   suggestions: readonly string[];
   defaultValue?: string[];
   placeholder?: string;
@@ -18,6 +18,10 @@ type TagPickerProps = {
  * Two ways to read the result: pass `name` to post selected tags as repeated
  * hidden form fields (server-action forms), or pass `onChange` to read the
  * tag list directly in client state (no form involved).
+ *
+ * Styling note: chips and the input are drawn as tonal fills, not outlines.
+ * This control repeats a lot across the app, and a screen full of 1px
+ * borders is the main thing that made it read as cluttered.
  */
 export function TagPicker({
   name,
@@ -54,22 +58,26 @@ export function TagPicker({
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <span className="text-sm font-medium">{label}</span>
+    <div className="flex flex-col gap-2.5">
+      {label ? (
+        <span className="text-[11px] font-semibold tracking-[0.12em] text-neutral-500 uppercase">
+          {label}
+        </span>
+      ) : null}
 
       {tags.length > 0 ? (
         <div className="flex flex-wrap gap-1.5">
           {tags.map((t) => (
             <span
               key={t}
-              className="flex items-center gap-1 rounded-full bg-accent-600 px-2.5 py-1 text-xs text-white dark:bg-accent-400 dark:text-white"
+              className="flex items-center gap-1.5 rounded-full bg-accent-600 px-3 py-1 text-xs font-medium text-white dark:bg-accent-400"
             >
               {t}
               <button
                 type="button"
                 onClick={() => removeTag(t)}
                 aria-label={`Remove ${t}`}
-                className="opacity-70 hover:opacity-100"
+                className="opacity-60 hover:opacity-100"
               >
                 &times;
               </button>
@@ -88,7 +96,7 @@ export function TagPicker({
           }
         }}
         placeholder={placeholder}
-        className="rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"
+        className="rounded-lg bg-neutral-100 px-3 py-2.5 text-sm placeholder:text-neutral-400 focus:ring-2 focus:ring-accent-600/30 focus:outline-none dark:bg-neutral-900"
       />
 
       {filtered.length > 0 ? (
@@ -98,9 +106,9 @@ export function TagPicker({
               key={s}
               type="button"
               onClick={() => addTag(s)}
-              className="rounded-full border border-neutral-300 px-2.5 py-1 text-xs text-neutral-600 hover:border-neutral-500 hover:text-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:hover:border-neutral-500 dark:hover:text-white"
+              className="rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-600 transition-colors hover:bg-accent-50 hover:text-accent-600 dark:bg-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
             >
-              + {s}
+              {s}
             </button>
           ))}
         </div>
@@ -108,7 +116,7 @@ export function TagPicker({
         <button
           type="button"
           onClick={() => addTag(query)}
-          className="self-start text-xs text-neutral-500 underline"
+          className="self-start text-xs text-neutral-500 underline underline-offset-2"
         >
           Add &quot;{query.trim()}&quot; as a custom option
         </button>

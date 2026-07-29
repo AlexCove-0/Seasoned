@@ -82,8 +82,10 @@ export default async function KitchenPage() {
 
       <InviteSection householdName={household.name} inviteCode={household.invite_code} />
 
-      <section className="flex flex-col gap-6">
-        <h2 className="text-lg font-medium">Kitchen Settings</h2>
+      <section className="flex flex-col gap-2">
+        <h2 className="mb-1 text-[11px] font-semibold tracking-[0.12em] text-neutral-500 uppercase">
+          Kitchen Settings
+        </h2>
         <AppliancesForm defaultValue={householdRow?.appliances ?? []} />
         <PantryStaplesForm defaultValue={householdRow?.pantry_staples ?? []} />
       </section>
