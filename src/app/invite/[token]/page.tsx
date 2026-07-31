@@ -13,8 +13,8 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
   const { token } = await params;
   const supabase = await createClient();
 
-  const { data } = await supabase.rpc("get_invite_target", { p_token: token }).returns<InviteTarget[]>();
-  const target = data?.[0];
+  const { data } = await supabase.rpc("get_invite_target", { p_token: token });
+  const target = (data as InviteTarget[] | null)?.[0];
 
   if (!target) notFound();
 

@@ -4,6 +4,7 @@ import { CHEF_SYSTEM_PROMPT } from "@/lib/ai/prompts";
 import { PROPOSE_RECIPE_TOOL, type RecipeDraft } from "@/lib/ai/tools";
 import { getCurrentHousehold } from "@/lib/household";
 import { createClient } from "@/lib/supabase/server";
+import type { FlavorAxes } from "@/lib/flavor/axes";
 import { buildDinerContext } from "@/lib/ai/diner-context";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
     taste_preferences: string[];
     disliked_tastes: string[];
     allergies: string[];
-    flavor_axes: Record<string, number> | null;
+    flavor_axes: FlavorAxes | null;
     texture_flags: string[] | null;
   }[] = [];
 
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
       .eq("household_id", household.id)
       .in("id", body.dinerIds)
       .returns<
-        { display_name: string; taste_preferences: string[]; disliked_tastes: string[]; allergies: string[]; flavor_axes: Record<string, number> | null; texture_flags: string[] | null }[]
+        { display_name: string; taste_preferences: string[]; disliked_tastes: string[]; allergies: string[]; flavor_axes: FlavorAxes | null; texture_flags: string[] | null }[]
       >();
     diners = data ?? [];
   }

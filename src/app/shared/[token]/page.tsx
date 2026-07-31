@@ -23,8 +23,8 @@ export default async function SharedRecipePage({
   const { token } = await params;
   const supabase = await createClient();
 
-  const { data } = await supabase.rpc("get_shared_recipe", { p_token: token }).returns<SharedRecipe[]>();
-  const recipe = data?.[0];
+  const { data } = await supabase.rpc("get_shared_recipe", { p_token: token });
+  const recipe = (data as SharedRecipe[] | null)?.[0];
 
   if (!recipe) notFound();
 
