@@ -13,10 +13,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Seasoned",
+  title: "Sazón",
   description: "Your personal chef instructor.",
   // Added to Home Screen on iOS, this opens without Safari's chrome.
-  appleWebApp: { capable: true, title: "Seasoned", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: "Sazón", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {

@@ -29,7 +29,7 @@ export default async function ProfileSetupPage() {
       <div>
         <h1 className="text-2xl font-semibold">Help us get to know you better</h1>
         <p className="text-sm text-neutral-500">
-          This shapes what Seasoned suggests for you specifically. You can change any
+          This shapes what Sazón suggests for you specifically. You can change any
           of it later from Kitchen Preferences.
         </p>
       </div>

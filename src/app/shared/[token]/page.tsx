@@ -32,7 +32,7 @@ export default async function SharedRecipePage({
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-8 px-4 py-10">
       <div>
         <p className="text-xs font-medium tracking-wide text-neutral-400 uppercase">
-          Shared from Seasoned
+          Shared from Sazón
         </p>
         <h1 className="mt-1 text-2xl font-semibold">{recipe.title}</h1>
         <p className="text-sm text-neutral-500">Serves {recipe.base_servings}</p>

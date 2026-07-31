@@ -14,10 +14,10 @@ export function InviteSection({
 
   async function sendInvite() {
     const url = `${window.location.origin}/household/setup?code=${inviteCode}`;
-    const text = `Come cook with us! Join ${householdName} on Seasoned — use invite code ${inviteCode} or tap this link:`;
+    const text = `Come cook with us! Join ${householdName} on Sazón — use invite code ${inviteCode} or tap this link:`;
     if (typeof navigator.share === "function") {
       try {
-        await navigator.share({ title: `Join ${householdName} on Seasoned`, text, url });
+        await navigator.share({ title: `Join ${householdName} on Sazón`, text, url });
         return;
       } catch {
         return; // share sheet dismissed -- nothing to do

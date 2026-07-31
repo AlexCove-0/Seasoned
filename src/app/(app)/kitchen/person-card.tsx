@@ -89,7 +89,7 @@ export function PersonCard({ member }: { member: Member }) {
     if (typeof navigator.share === "function") {
       try {
         await navigator.share({
-          title: "Taste profile for Seasoned",
+          title: "Taste profile for Sazón",
           text: `Hey ${member.display_name}, fill out your taste profile so recipes actually turn out how you like them:`,
           url,
         });

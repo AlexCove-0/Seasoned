@@ -10,7 +10,7 @@ type RequestBody =
 
 async function fetchUrlText(url: string): Promise<string> {
   const res = await fetch(url, {
-    headers: { "User-Agent": "Mozilla/5.0 (compatible; SeasonedRecipeImport/1.0)" },
+    headers: { "User-Agent": "Mozilla/5.0 (compatible; SazonRecipeImport/1.0)" },
     signal: AbortSignal.timeout(10000),
   });
   const html = await res.text();

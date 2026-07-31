@@ -30,7 +30,7 @@ export function QuestionnaireForm({
         <p>Thanks, {displayName}! Your taste profile is saved.</p>
 
         <div className="flex flex-col gap-2">
-          <p className="font-medium">Sharpen your skills in the kitchen with Seasoned:</p>
+          <p className="font-medium">Sharpen your skills in the kitchen with Sazón:</p>
           <ul className="flex flex-col gap-1.5 text-neutral-600 dark:text-neutral-400">
             {HIGHLIGHTS.map((h) => (
               <li key={h} className="flex gap-2">
