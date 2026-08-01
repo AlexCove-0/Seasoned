@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Recipe } from "@/lib/types";
+import { scaleIngredient } from "@/lib/scale-ingredients";
+import { IngredientChecklist } from "@/components/ingredient-checklist";
 
 function beep() {
   try {
@@ -126,6 +128,48 @@ function StepTimer() {
   );
 }
 
+function IngredientsDrawer({ recipe }: { recipe: Recipe }) {
+  const [open, setOpen] = useState(false);
+  const [checked, setChecked] = useState<Set<number>>(new Set());
+
+  const lines = recipe.ingredients.map((ing) => scaleIngredient(ing, 1));
+
+  function toggle(index: number) {
+    setChecked((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  }
+
+  return (
+    <div className="rounded-lg bg-neutral-100 dark:bg-neutral-900">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium"
+      >
+        <span>
+          Ingredients
+          {checked.size > 0 ? (
+            <span className="ml-2 font-normal text-neutral-500">
+              {checked.size}/{lines.length} in
+            </span>
+          ) : null}
+        </span>
+        <span aria-hidden="true" className="text-neutral-500">
+          {open ? "▴" : "▾"}
+        </span>
+      </button>
+      {open ? <div className="px-3 pb-3">
+        <IngredientChecklist lines={lines} checked={checked} onToggle={toggle} />
+      </div> : null}
+    </div>
+  );
+}
+
 export function CookModeClient({ recipe }: { recipe: Recipe }) {
   const [stepIndex, setStepIndex] = useState(0);
   const step = recipe.steps[stepIndex];
@@ -146,6 +190,8 @@ export function CookModeClient({ recipe }: { recipe: Recipe }) {
       </div>
 
       <h1 className="text-lg font-medium text-neutral-500">{recipe.title}</h1>
+
+      <IngredientsDrawer recipe={recipe} />
 
       <div className="flex flex-1 flex-col justify-center gap-4">
         <p className="text-2xl leading-snug font-medium">{step.instruction}</p>
