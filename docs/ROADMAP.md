@@ -102,6 +102,31 @@ The cheapest, highest-impact fixes for daily desire to open the app.
 16. Inline timers parsed from steps (Epicurious smart timer, but automatic).
 17. Seasonal/holiday suggestions keyed to the calendar (Tasty does this well).
 
+## Idea backlog (from real cooking life)
+
+*2026-07-31, from Alex — the al dente problem.* Alex likes pasta under, his wife likes
+it over, and her preference wins because he doesn't feel strongly. Three product ideas
+fall out of that one dinner:
+
+- **Split-the-difference technique.** When diners' profiles conflict on a dish, the AI
+  shouldn't average them — it should resolve the conflict *in the steps* where possible:
+  "pull half the spaghetti at 9 minutes, give the rest 2 more." A human chef would never
+  force one doneness on a table of two. Static recipe apps can't do this; a generated
+  recipe that knows tonight's diners can. Sauce heat (split before adding chili), doneness,
+  dressing on the side — lots of conflicts are cheap to split late in the cook.
+- **Preference intensity, not just direction.** "Her preference wins b/c I don't really
+  care" is data: two people at the same point on a flavor axis can hold it with different
+  strength. A light "how much do you care?" dimension on profile answers (or inferred from
+  who defers in ratings/notes) would let the chef weight tonight's compromise honestly.
+  Related social patterns worth supporting someday: turn-taking ("whose night wins"),
+  kids'-choice nights.
+- **Profiles that learn from cooking.** The quiz is a snapshot; the cook logs are the
+  stream. Adjustments ("cooked 2 min longer", "halved the chili") and per-person ratings
+  are exactly the evidence that a profile axis is drifting or was wrong. Periodically —
+  or right after a log — the app should propose profile nudges ("You've added heat three
+  cooks in a row: bump your heat axis?"), with the person confirming rather than silent
+  drift. `flavor_profile_history` already exists to record exactly this kind of change.
+
 ### Deliberately skipping
 - Recipe videos (content treadmill we can't win; AI technique notes are our answer).
 - Public community features (this is a family app; household notes cover it).
