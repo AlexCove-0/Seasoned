@@ -78,7 +78,18 @@ at the table and writes the accommodation into the recipe itself.
    parents systematically undercount, showing "offered 9x — keep going" reframes what
    success means mid-journey. Explicitly not a "did she eat it" tracker.
 
-6. **Positioning guardrail.** Sazón is a family cooking app that supports what feeding
+6. **The "picky eater" toggle — how all of this gets captured.** (Alex, 2026-07-31)
+   When setting up a profile for a kid (or anyone), one plain-language question: *"Is
+   ___ a picky eater?"* Toggling it on progressively discloses the deeper questions;
+   everyone else keeps the short setup. Follow-ups, all skippable, checklist-style:
+   safe foods (free text, encourage specificity), textures to avoid (mushy, slimy,
+   gritty, mixed...), structure rules (no touching/mixing, sauce on side, components
+   separate), and optionally "anything they're warming up to?" (seeds the exposure
+   features). The toggle itself is signal even with zero follow-ups answered — the chef
+   knows to keep that diner's portion simple and separable. And it's reversible: as a
+   kid's palate expands, flipping it off is a milestone, not a settings chore.
+
+7. **Positioning guardrail.** Sazón is a family cooking app that supports what feeding
    therapists assign as home practice (chaining, neutral exposure, DOR mealtimes). It is
    not therapy, makes no clinical claims, and should say so wherever these features
    surface. If a family works with an OT/SLP/feeding therapist, the safe-foods list and
