@@ -121,11 +121,20 @@ fall out of that one dinner:
   Related social patterns worth supporting someday: turn-taking ("whose night wins"),
   kids'-choice nights.
 - **Profiles that learn from cooking.** The quiz is a snapshot; the cook logs are the
-  stream. Adjustments ("cooked 2 min longer", "halved the chili") and per-person ratings
-  are exactly the evidence that a profile axis is drifting or was wrong. Periodically —
-  or right after a log — the app should propose profile nudges ("You've added heat three
-  cooks in a row: bump your heat axis?"), with the person confirming rather than silent
-  drift. `flavor_profile_history` already exists to record exactly this kind of change.
+  stream. But (Alex, 2026-07-31, "the Cholula problem"): behavior is context-bound while
+  preferences are durable — someone who put hot sauce on everything for a week was
+  probably camping, not becoming a heat person. Design principles that fall out:
+  - *Most adjustments are about the dish, not the person.* "Added 2 min" usually means
+    the recipe was miscalibrated. So learn at two levels with different bars:
+  - *Dish-level learning* (low risk, do first): "You've added extra garlic to this dish
+    twice — bake it in?" A recipe correcting toward how the family actually cooks it.
+  - *Person-level learning* (high bar): only propose moving a flavor axis when the same
+    signal shows up across many *different* dishes over a long window — that's the filter
+    that drops the camping trip. One dish adjusted repeatedly = the dish. Twenty dishes
+    drifting the same direction over months = the person.
+  - *Propose, never silently drift.* "More heat across 14 cooks since spring — bump your
+    heat axis?" lets vacation-me get vetoed by home-me. `flavor_profile_history` already
+    exists to record confirmed changes; needs more design before building.
 
 ### Deliberately skipping
 - Recipe videos (content treadmill we can't win; AI technique notes are our answer).
