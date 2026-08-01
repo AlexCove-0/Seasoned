@@ -11,7 +11,7 @@ export function RecipeCarousel({
   emptyText: string;
 }) {
   return (
-    <section className="flex flex-col gap-2">
+    <section className="flex min-w-0 flex-col gap-2">
       <h2 className="text-[11px] font-semibold tracking-[0.12em] text-neutral-500 uppercase">
         {title}
       </h2>
