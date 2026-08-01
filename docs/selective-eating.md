@@ -1,8 +1,12 @@
 # Selective eating, sensory needs, and how Sazón can help
 
-*Research notes, 2026-07-31. Prompted by Alex's daughter (4½, no-mixed-foods, texture-driven
-preferences) and the observation that parents of kids with special needs face a much more
-intense version of the same dinner problem.*
+*Research notes, 2026-07-31. Context: Alex's daughter (4½) is a typical picky eater —
+no-mixed-foods, texture-driven preferences, already improving with age, not autistic.
+The observation that prompted this research: parents of kids with special needs face a
+much more intense, longer-lasting version of the same dinner problem, and the same
+features that help a typical 4-year-old's family should scale up to help them too. The
+research below is mostly about that clinical end (autism, ARFID); the no-pressure and
+exposure principles apply across the whole range.*
 
 ## What the research says
 
