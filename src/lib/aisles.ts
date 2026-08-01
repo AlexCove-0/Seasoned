@@ -19,7 +19,8 @@ export const AISLES = [
 export type Aisle = (typeof AISLES)[number];
 
 // Longer, more specific phrases must come before the generic word they
-// contain -- "coconut milk" is Pantry, not Dairy.
+// contain -- "coconut milk" is Pantry, not Dairy, and "chicken stock" is
+// Pantry, not Meat. First match wins, so order here is the whole design.
 const KEYWORDS: [string, Aisle][] = [
   // Specific overrides first
   ["coconut milk", "Pantry"],
@@ -35,6 +36,26 @@ const KEYWORDS: [string, Aisle][] = [
   ["tomato sauce", "Pantry"],
   ["frozen", "Frozen"],
   ["ice cream", "Frozen"],
+  // Shelf-stable liquids, ahead of the animal they came from.
+  ["stock", "Pantry"],
+  ["broth", "Pantry"],
+  ["bouillon", "Pantry"],
+  // Ground/whole spices, ahead of the fresh vegetable of the same name.
+  ["black pepper", "Spices & Seasoning"],
+  ["white pepper", "Spices & Seasoning"],
+  ["peppercorn", "Spices & Seasoning"],
+  ["cayenne", "Spices & Seasoning"],
+  ["chili powder", "Spices & Seasoning"],
+  ["chili flake", "Spices & Seasoning"],
+  ["red pepper flake", "Spices & Seasoning"],
+  ["pepper flake", "Spices & Seasoning"],
+  ["paprika", "Spices & Seasoning"],
+  ["garlic powder", "Spices & Seasoning"],
+  ["onion powder", "Spices & Seasoning"],
+  ["dried ", "Spices & Seasoning"],
+  ["olive", "Pantry"],
+  ["caper", "Pantry"],
+  ["pickle", "Pantry"],
 
   // Produce
   ["lettuce", "Produce"], ["spinach", "Produce"], ["kale", "Produce"],

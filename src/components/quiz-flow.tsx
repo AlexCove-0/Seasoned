@@ -79,18 +79,24 @@ export function QuizFlow({
         </div>
       </div>
 
-      <div className="flex flex-col gap-1">
+      {/* The scene carries the setup the question depends on ("same roast
+          chicken, two finishes"), so it's set as a readable lead-in sentence
+          rather than a tracked-uppercase eyebrow -- styled as a label it
+          read as decoration and got skipped, leaving a question that made
+          no sense on its own. */}
+      <div className="flex flex-col gap-1.5">
         {question.scene ? (
-          <p className="text-xs font-semibold tracking-[0.14em] text-neutral-500 uppercase">
-            {question.scene}
-          </p>
+          <p className="text-base text-neutral-600 dark:text-neutral-400">{question.scene}</p>
         ) : null}
         <h1 className="text-2xl leading-snug font-semibold tracking-tight text-balance">
           {question.prompt}
         </h1>
       </div>
 
-      <div className="flex flex-col gap-2.5">
+      {/* Extra breathing room here on purpose: the option cards are visually
+          heavy, and with a tight gap the eye jumps straight past the
+          question into them. */}
+      <div className="flex flex-col gap-2.5 pt-1">
         {question.options.map((option) => (
           <button
             key={option.id}
