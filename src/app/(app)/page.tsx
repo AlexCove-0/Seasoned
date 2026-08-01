@@ -5,6 +5,8 @@ import { getCurrentHousehold } from "@/lib/household";
 import { RecipeCarousel } from "@/components/recipe-carousel";
 import { topRecipes, recommendedRecipes, type RankedRecipe } from "@/lib/recipe-ranking";
 import { RecipeList } from "./recipe-list";
+import { TonightCard, type TonightMeal } from "./tonight-card";
+import { todayIso } from "@/lib/week";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -35,6 +37,35 @@ export default async function Home() {
     .select("id, title, base_servings, image_path, cook_logs(rating, cooked_at)")
     .returns<RankedRecipe[]>();
 
+  const { data: tonightRaw } = await supabase
+    .from("meal_plan_entries")
+    .select("id, note, recipe_id, recipes(title, image_path)")
+    .eq("household_id", household.id)
+    .eq("planned_for", todayIso())
+    .order("created_at", { ascending: true })
+    .returns<
+      {
+        id: string;
+        note: string | null;
+        recipe_id: string | null;
+        recipes:
+          | { title: string; image_path: string | null }
+          | { title: string; image_path: string | null }[]
+          | null;
+      }[]
+    >();
+
+  const tonight: TonightMeal[] = (tonightRaw ?? []).map((e) => {
+    const recipe = Array.isArray(e.recipes) ? e.recipes[0] : e.recipes;
+    return {
+      id: e.id,
+      recipe_id: e.recipe_id,
+      recipe_title: recipe?.title ?? null,
+      recipe_image: recipe?.image_path ?? null,
+      note: e.note,
+    };
+  });
+
   const ranked = recipesWithLogs ?? [];
   const top = topRecipes(ranked);
   const recommended = recommendedRecipes(ranked, new Set(top.map((r) => r.id)));
@@ -45,6 +76,8 @@ export default async function Home() {
         <h1 className="text-2xl font-semibold tracking-tight">{household.name}</h1>
         <p className="text-sm text-neutral-500">Signed in as {household.display_name}</p>
       </header>
+
+      <TonightCard meals={tonight} />
 
       <div className="flex gap-2">
         <Link

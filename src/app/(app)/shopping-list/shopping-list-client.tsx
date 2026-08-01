@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { groupByAisle } from "@/lib/aisles";
 import { addItem, toggleItem, deleteItem, clearChecked } from "./actions";
 
 export type ShoppingItem = { id: string; name: string; checked: boolean };
@@ -43,14 +44,26 @@ export function ShoppingListClient({ items }: { items: ShoppingItem[] }) {
         </button>
       </form>
 
-      <ul className="flex flex-col gap-1">
-        {unchecked.length === 0 && checked.length === 0 ? (
-          <li className="text-sm text-neutral-500">List&apos;s empty — add something above.</li>
-        ) : null}
-        {unchecked.map((item) => (
-          <ShoppingRow key={item.id} item={item} />
+      {unchecked.length === 0 && checked.length === 0 ? (
+        <p className="text-sm text-neutral-500">List&apos;s empty — add something above.</p>
+      ) : null}
+
+      {/* Grouped by aisle so the list matches the walk through the store
+          instead of the order things happened to get added. */}
+      <div className="flex flex-col gap-4">
+        {groupByAisle(unchecked, (i) => i.name).map(({ aisle, items }) => (
+          <div key={aisle} className="flex flex-col gap-1">
+            <span className="text-[11px] font-semibold tracking-[0.12em] text-neutral-500 uppercase">
+              {aisle}
+            </span>
+            <ul className="flex flex-col gap-1">
+              {items.map((item) => (
+                <ShoppingRow key={item.id} item={item} />
+              ))}
+            </ul>
+          </div>
         ))}
-      </ul>
+      </div>
 
       {checked.length > 0 ? (
         <div className="flex flex-col gap-1">
