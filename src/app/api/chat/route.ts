@@ -95,10 +95,11 @@ export async function POST(request: Request) {
 
   // A truncated tool call parses fine but is missing pieces -- never hand
   // the UI a recipe it could save half-formed.
-  if (recipe && (!Array.isArray(recipe.steps) || recipe.steps.length === 0)) {
-    recipe = null;
-    if (!reply) reply = "That recipe came through incomplete — ask me to try again.";
-  }
-
-  return NextResponse.json({ reply, recipe });
+  const complete = recipe !== null && Array.isArray(recipe.steps) && recipe.steps.length > 0;
+  return NextResponse.json({
+    reply:
+      reply ||
+      (recipe && !complete ? "That recipe came through incomplete — ask me to try again." : ""),
+    recipe: complete ? recipe : null,
+  });
 }
