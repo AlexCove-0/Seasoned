@@ -26,7 +26,11 @@ export type QuizQuestion = {
   prompt: string;
   scene?: string;
   options: QuizOption[];
-  /** Present on tie-breakers: the axis this question exists to resolve. */
+  /**
+   * The axis this question primarily measures. Set on tie-breakers and
+   * alternates; used to keep retake sets covering every axis and to target
+   * "go deeper" rounds at whatever is still uncertain.
+   */
   resolves?: AxisId;
 };
 
@@ -610,8 +614,211 @@ export const TIE_BREAKERS: QuizQuestion[] = [
   },
 ];
 
-export const ALL_QUESTIONS = [...CORE_QUIZ, ...TIE_BREAKERS];
+/**
+ * Interchangeable with the core questions: each targets one axis through a
+ * different everyday scene, so a retake isn't a memory test of last time's
+ * answers, and "go deeper" rounds have fresh material. Same discipline as
+ * the core set -- forced choices between real pleasures, weights mostly on
+ * the one axis the scene is actually about.
+ */
+export const ALTERNATES: QuizQuestion[] = [
+  {
+    id: "alt_coffee",
+    resolves: "bitter",
+    scene: "Morning coffee",
+    prompt: "How does it leave the counter?",
+    options: [
+      { id: "black", label: "Black, dark roast", detail: "The edge is the point.", weights: { bitter: 3 } },
+      { id: "splash", label: "A splash of milk", detail: "Just to round the corners.", weights: { bitter: 1 } },
+      { id: "sweet", label: "Pale and sweet", detail: "Coffee-flavored comfort.", weights: { bitter: -2, richness: 1 } },
+      { id: "none", label: "Tea or nothing", detail: "Coffee's not my thing.", weights: {} },
+    ],
+  },
+  {
+    id: "alt_greens",
+    resolves: "bitter",
+    scene: "The salad mix is heavy on arugula and radicchio",
+    prompt: "Good news or bad news?",
+    options: [
+      { id: "good", label: "Good news", detail: "The sharp leaves are the best ones.", weights: { bitter: 2 } },
+      { id: "fine", label: "Fine with dressing", detail: "They earn their place dressed.", weights: { bitter: 0 } },
+      { id: "bad", label: "I'd pick around them", detail: "Give me the sweet crunchy lettuce.", weights: { bitter: -2 } },
+    ],
+  },
+  {
+    id: "alt_salsa",
+    resolves: "heat",
+    scene: "Taqueria counter, four salsas",
+    prompt: "Which one goes on?",
+    options: [
+      { id: "pico", label: "Pico, mild", detail: "Flavor without the burn.", weights: { heat: -2 } },
+      { id: "verde", label: "The green one", detail: "A gentle hum.", weights: { heat: 1 } },
+      { id: "roja", label: "The dark red one", detail: "Proper heat.", weights: { heat: 2 } },
+      { id: "warned", label: "The one they warn you about", detail: "That's why it exists.", weights: { heat: 3, adventure: 1 } },
+    ],
+  },
+  {
+    id: "alt_thai",
+    resolves: "heat",
+    scene: "Ordering Thai",
+    prompt: "Spice level?",
+    options: [
+      { id: "mild", label: "Mild, please", detail: "I'm here for the herbs and lime.", weights: { heat: -3 } },
+      { id: "medium", label: "Medium", detail: "Warmth, not pain.", weights: { heat: 1 } },
+      { id: "hot", label: "Hot", detail: "Sweat a little, live a little.", weights: { heat: 2 } },
+      { id: "thai_hot", label: "Thai hot", detail: "Same as the kitchen eats it.", weights: { heat: 3 } },
+    ],
+  },
+  {
+    id: "alt_mash",
+    resolves: "richness",
+    scene: "You're making the mashed potatoes",
+    prompt: "What goes in?",
+    options: [
+      { id: "loaded", label: "Butter, then more butter", detail: "Cream too. It's a holiday somewhere.", weights: { richness: 3 } },
+      { id: "balanced", label: "Enough butter to notice", detail: "Rich, but still potato.", weights: { richness: 1 } },
+      { id: "olive", label: "Olive oil and the cooking water", detail: "Silky without the dairy weight.", weights: { richness: -2 } },
+    ],
+  },
+  {
+    id: "alt_fries",
+    resolves: "acid",
+    scene: "Hot fries on the table",
+    prompt: "What are they getting dipped in?",
+    options: [
+      { id: "vinegar", label: "Malt vinegar, straight on", detail: "Sharp beats creamy.", weights: { acid: 2 } },
+      { id: "ketchup", label: "Ketchup", detail: "The classic for a reason.", weights: {} },
+      { id: "mayo", label: "Mayo or aioli", detail: "Fat on fat, no notes.", weights: { richness: 2, acid: -1 } },
+      { id: "plain", label: "Nothing, just salt", detail: "Don't interrupt a good fry.", weights: {} },
+    ],
+  },
+  {
+    id: "alt_pickle",
+    resolves: "acid",
+    scene: "The sandwich comes with a big dill pickle",
+    prompt: "What happens to it?",
+    options: [
+      { id: "first", label: "Eaten first", detail: "Might ask for a second.", weights: { acid: 2 } },
+      { id: "alongside", label: "Bites in rotation", detail: "It's there to cut the sandwich.", weights: { acid: 1 } },
+      { id: "traded", label: "Traded away", detail: "Too sharp, too loud.", weights: { acid: -2 } },
+    ],
+  },
+  {
+    id: "alt_cheese",
+    resolves: "funk",
+    scene: "A cheese board goes by",
+    prompt: "First reach?",
+    options: [
+      { id: "stinky", label: "The soft stinky one", detail: "If it clears the room, it's mine.", weights: { funk: 3 } },
+      { id: "aged", label: "The hard aged one", detail: "Crystals and depth.", weights: { funk: 1 } },
+      { id: "fresh", label: "The fresh mild one", detail: "Mozzarella territory, clean and milky.", weights: { funk: -2 } },
+    ],
+  },
+  {
+    id: "alt_fishsauce",
+    resolves: "funk",
+    scene: "The recipe calls for a tablespoon of fish sauce",
+    prompt: "Your move?",
+    options: [
+      { id: "more", label: "I round it up", detail: "That's where the savor lives.", weights: { funk: 2 } },
+      { id: "aswritten", label: "As written", detail: "Trust the recipe.", weights: { funk: 0 } },
+      { id: "swap", label: "Swap in something milder", detail: "Soy sauce and call it close enough.", weights: { funk: -2 } },
+    ],
+  },
+  {
+    id: "alt_pineapple",
+    resolves: "sweet_savory",
+    scene: "The eternal question",
+    prompt: "Pineapple on pizza?",
+    options: [
+      { id: "yes", label: "Yes, gladly", detail: "Sweet, salty, a little char — that's a system working.", weights: { sweet_savory: 3 } },
+      { id: "try", label: "I'd eat a slice", detail: "Not my order, not a crime.", weights: { sweet_savory: 1 } },
+      { id: "never", label: "Absolutely not", detail: "Fruit had its chance at breakfast.", weights: { sweet_savory: -2 } },
+    ],
+  },
+  {
+    id: "alt_maple",
+    resolves: "sweet_savory",
+    scene: "Breakfast plate, syrup migrating",
+    prompt: "The maple syrup is touching the bacon.",
+    options: [
+      { id: "best", label: "That's the best bite", detail: "I'd drag it through on purpose.", weights: { sweet_savory: 2 } },
+      { id: "tolerable", label: "It happens", detail: "Not mad about it.", weights: { sweet_savory: 0 } },
+      { id: "walls", label: "Everything in its place", detail: "Sweet stays on its side of the plate.", weights: { sweet_savory: -2 } },
+    ],
+  },
+  {
+    id: "alt_newcity",
+    resolves: "adventure",
+    scene: "First night somewhere you've never been",
+    prompt: "Dinner is...",
+    options: [
+      { id: "street", label: "Whatever the street line is for", detail: "Can't read the menu. Perfect.", weights: { adventure: 3 } },
+      { id: "researched", label: "The place I bookmarked", detail: "Adventurous, but vetted.", weights: { adventure: 1 } },
+      { id: "familiar", label: "Something I recognize", detail: "Travel is tiring. Dinner shouldn't be.", weights: { adventure: -2 } },
+    ],
+  },
+  {
+    id: "alt_swap",
+    resolves: "adventure",
+    scene: "The recipe needs three ingredients you've never bought",
+    prompt: "What happens?",
+    options: [
+      { id: "hunt", label: "I hunt them down", detail: "That's half the fun.", weights: { adventure: 2 } },
+      { id: "sub", label: "I substitute familiar ones", detail: "Close enough is close enough.", weights: { adventure: -2 } },
+    ],
+  },
+];
+
+export const ALL_QUESTIONS = [...CORE_QUIZ, ...TIE_BREAKERS, ...ALTERNATES];
 export const MAX_TIE_BREAKERS = 3;
-// 3: added direct heat/acid questions and made scoring symmetric, after
-// side-effect weights were mislabelling people (see q15/q16).
+// 3: added direct heat/acid questions, symmetric scoring, and the
+// alternates bank for retake variance and go-deeper rounds.
 export const QUIZ_VERSION = 3;
+
+/** The axis a question is mostly about, for coverage checks and targeting. */
+export function primaryAxis(q: QuizQuestion): AxisId | null {
+  if (q.resolves) return q.resolves;
+  const totals = new Map<AxisId, number>();
+  for (const o of q.options) {
+    for (const [axis, w] of Object.entries(o.weights)) {
+      totals.set(axis as AxisId, (totals.get(axis as AxisId) ?? 0) + Math.abs(w ?? 0));
+    }
+  }
+  let best: AxisId | null = null;
+  let bestTotal = 0;
+  for (const [axis, total] of totals) {
+    if (total > bestTotal) { best = axis; bestTotal = total; }
+  }
+  return best;
+}
+
+/**
+ * The question set for a sitting. First-timers get the calibrated core set.
+ * Retakes swap a shuffled handful of core questions for alternates covering
+ * the same axes, so coming back isn't re-answering last time's quiz from
+ * memory. Scoring normalizes over whatever was actually asked, so any mix
+ * is valid.
+ */
+export function buildQuizSet(opts: { retake: boolean } = { retake: false }): QuizQuestion[] {
+  if (!opts.retake) return CORE_QUIZ;
+
+  const shuffledAlts = [...ALTERNATES].sort(() => Math.random() - 0.5);
+  const set = [...CORE_QUIZ];
+
+  // Swap one core question per alternate axis, at most once per axis, and
+  // cap the swaps so the calibrated core still anchors most of the sitting.
+  const swappedAxes = new Set<string>();
+  let swaps = 0;
+  for (const alt of shuffledAlts) {
+    if (swaps >= 5) break;
+    const axis = primaryAxis(alt);
+    if (!axis || swappedAxes.has(axis)) continue;
+    const coreIdx = set.findIndex((q) => !q.id.startsWith("alt_") && primaryAxis(q) === axis);
+    if (coreIdx === -1) continue;
+    set[coreIdx] = alt;
+    swappedAxes.add(axis);
+    swaps++;
+  }
+  return set;
+}

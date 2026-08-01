@@ -1,7 +1,9 @@
 import { AXES, type AxisId, type FlavorAxes } from "./axes";
 import {
+  ALL_QUESTIONS,
   CORE_QUIZ,
   MAX_TIE_BREAKERS,
+  primaryAxis,
   TIE_BREAKERS,
   type QuizQuestion,
 } from "./quiz";
@@ -74,15 +76,73 @@ export function scoreQuiz(answers: QuizAnswers, asked: QuizQuestion[] = CORE_QUI
  * exactly the axes a targeted question can resolve, and asking only those
  * keeps the quiz short for people whose core answers were already decisive.
  */
-export function pickTieBreakers(coreAnswers: QuizAnswers): QuizQuestion[] {
-  const { axes } = scoreQuiz(coreAnswers, CORE_QUIZ);
+export function pickTieBreakers(
+  answers: QuizAnswers,
+  asked: QuizQuestion[] = CORE_QUIZ,
+): QuizQuestion[] {
+  const { axes } = scoreQuiz(answers, asked);
+  const askedIds = new Set(asked.map((q) => q.id));
 
   return AXES.map((axis) => ({ axis: axis.id, ambiguity: 50 - Math.abs(axes[axis.id] - 50) }))
     .filter((entry) => entry.ambiguity > 40) // i.e. axis landed within 10 of neutral
     .sort((a, b) => b.ambiguity - a.ambiguity)
     .slice(0, MAX_TIE_BREAKERS)
-    .map((entry) => TIE_BREAKERS.find((q) => q.resolves === entry.axis))
+    .map((entry) => TIE_BREAKERS.find((q) => q.resolves === entry.axis && !askedIds.has(q.id)))
     .filter((q): q is QuizQuestion => Boolean(q));
+}
+
+/**
+ * The optional "keep going" round: up to `count` unasked questions from the
+ * whole bank, aimed at whichever axes the answers so far have pinned down
+ * least. Returns empty once the bank is exhausted -- the UI stops offering
+ * more at that point, so quiz length is bounded by content, not a magic
+ * number.
+ */
+export function pickDeeperRound(
+  answers: QuizAnswers,
+  asked: QuizQuestion[],
+  count = 5,
+): QuizQuestion[] {
+  const { axes } = scoreQuiz(answers, asked);
+  const askedIds = new Set(asked.map((q) => q.id));
+  const pool = ALL_QUESTIONS.filter((q) => !askedIds.has(q.id));
+  if (pool.length === 0) return [];
+
+  // Least-settled axes first, so extra questions sharpen the blurry parts
+  // of the profile instead of re-confirming the obvious ones.
+  const axisOrder = AXES.map((a) => ({ id: a.id, certainty: Math.abs(axes[a.id] - 50) }))
+    .sort((a, b) => a.certainty - b.certainty)
+    .map((a) => a.id);
+
+  const picked: QuizQuestion[] = [];
+  const remaining = new Set(pool.map((q) => q.id));
+
+  // Round-robin the axes so one blurry axis doesn't eat the whole round.
+  outer: while (picked.length < count) {
+    let pulledAny = false;
+    for (const axisId of axisOrder) {
+      if (picked.length >= count) break outer;
+      const q = pool.find((cand) => remaining.has(cand.id) && primaryAxis(cand) === axisId);
+      if (q) {
+        picked.push(q);
+        remaining.delete(q.id);
+        pulledAny = true;
+      }
+    }
+    if (!pulledAny) break;
+  }
+
+  // Bank still has questions but none target the blurry axes: fill anyway,
+  // more signal is more signal.
+  for (const q of pool) {
+    if (picked.length >= count) break;
+    if (remaining.has(q.id)) {
+      picked.push(q);
+      remaining.delete(q.id);
+    }
+  }
+
+  return picked;
 }
 
 const ARCHETYPE_WORDS: Record<AxisId, { high: [string, string]; low: [string, string] }> = {

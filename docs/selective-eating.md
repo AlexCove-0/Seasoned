@@ -89,7 +89,17 @@ at the table and writes the accommodation into the recipe itself.
    knows to keep that diner's portion simple and separable. And it's reversible: as a
    kid's palate expands, flipping it off is a milestone, not a settings chore.
 
-7. **Positioning guardrail.** Sazón is a family cooking app that supports what feeding
+7. **A kids' version of the flavor quiz.** (Alex, 2026-08-01) Worth building, but as
+   its own short instrument, not a reskin: the adult quiz trades one pleasure against
+   another ("pan sauce or bright finish"), which assumes an experienced palate. A kid
+   version should (a) use concrete foods kids actually know, (b) measure the axes that
+   matter for kids — texture and structure first, adventure, sweet-savory — and go
+   light on funk/bitter, which are developmentally low in most kids anyway, (c) be
+   answerable two ways: read-aloud with the kid, or parent-as-proxy ("which would she
+   pick?"), and (d) stay under ~8 questions. Connects to the picky-eater toggle: a good
+   kid quiz could *replace* most of those follow-up questions with something fun.
+
+8. **Positioning guardrail.** Sazón is a family cooking app that supports what feeding
    therapists assign as home practice (chaining, neutral exposure, DOR mealtimes). It is
    not therapy, makes no clinical claims, and should say so wherever these features
    surface. If a family works with an OT/SLP/feeding therapist, the safe-foods list and

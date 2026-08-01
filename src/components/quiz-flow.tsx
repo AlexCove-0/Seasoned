@@ -1,58 +1,75 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CORE_QUIZ, type QuizQuestion } from "@/lib/flavor/quiz";
+import type { QuizQuestion } from "@/lib/flavor/quiz";
 import { pickTieBreakers, scoreQuiz, type QuizAnswers, type QuizResult } from "@/lib/flavor/scoring";
 
+export type QuizSession = { answers: QuizAnswers; asked: QuizQuestion[] };
+
 /**
- * The question-asking half of the quiz, with no opinion about who the answers
- * belong to or where they get saved. Both the signed-in version (saving to a
- * profile) and the public version (saving to a shareable token) wrap this.
+ * The question-asking half of the quiz, with no opinion about who the
+ * answers belong to or where they get saved. Both the signed-in version and
+ * the public version wrap this.
+ *
+ * `initialAnswers` supports the "go deeper" rounds: the parent re-renders
+ * this with the previous sitting's answers plus freshly picked questions
+ * appended, and the flow resumes at the first unanswered one.
  */
 export function QuizFlow({
+  questions,
+  initialAnswers = {},
   onScored,
   busy = false,
   error = null,
   skip = null,
 }: {
-  onScored: (result: QuizResult) => void;
+  questions: QuizQuestion[];
+  initialAnswers?: QuizAnswers;
+  onScored: (result: QuizResult, session: QuizSession) => void;
   busy?: boolean;
   error?: string | null;
   /** Optional escape hatch, e.g. "Skip for now" back into the app. */
   skip?: { href: string; label: string } | null;
 }) {
-  const [index, setIndex] = useState(0);
-  const [answers, setAnswers] = useState<QuizAnswers>({});
+  const resuming = Object.keys(initialAnswers).length > 0;
+  const firstUnanswered = useMemo(() => {
+    const idx = questions.findIndex((q) => !(q.id in initialAnswers));
+    return idx === -1 ? 0 : idx;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const [index, setIndex] = useState(firstUnanswered);
+  const [answers, setAnswers] = useState<QuizAnswers>(initialAnswers);
   const [followUps, setFollowUps] = useState<QuizQuestion[]>([]);
 
-  // Core questions first; follow-ups get appended once the core round
+  // Base questions first; tie-breakers get appended once the base round
   // reveals which axes we still don't understand about this person.
-  const questions = useMemo(() => [...CORE_QUIZ, ...followUps], [followUps]);
-  const question = questions[index];
-  const total = questions.length;
+  const allQuestions = useMemo(() => [...questions, ...followUps], [questions, followUps]);
+  const question = allQuestions[index];
+  const total = allQuestions.length;
 
   function choose(optionId: string) {
     const next = { ...answers, [question.id]: optionId };
     setAnswers(next);
 
-    const isLastCore = index === CORE_QUIZ.length - 1 && followUps.length === 0;
-    if (isLastCore) {
-      const extra = pickTieBreakers(next);
+    const isLastBase = index === questions.length - 1 && followUps.length === 0;
+    if (isLastBase && !resuming) {
+      const extra = pickTieBreakers(next, questions);
       if (extra.length > 0) {
         setFollowUps(extra);
         setIndex(index + 1);
         return;
       }
-      onScored(scoreQuiz(next, CORE_QUIZ));
+      onScored(scoreQuiz(next, questions), { answers: next, asked: questions });
       return;
     }
 
-    if (index < questions.length - 1) {
+    if (index < allQuestions.length - 1) {
       setIndex(index + 1);
       return;
     }
 
-    onScored(scoreQuiz(next, questions));
+    onScored(scoreQuiz(next, allQuestions), { answers: next, asked: allQuestions });
   }
 
   const progress = (index / total) * 100;
@@ -69,7 +86,8 @@ export function QuizFlow({
         <div className="flex items-center justify-between text-xs text-neutral-500">
           <span className="font-mono tabular-nums">
             {String(index + 1).padStart(2, "0")} / {total}
-            {question?.resolves ? " · narrowing in" : ""}
+            {question?.resolves && !resuming ? " · narrowing in" : ""}
+            {resuming ? " · going deeper" : ""}
           </span>
           {skip ? (
             <a href={skip.href} className="underline underline-offset-2">
@@ -111,7 +129,7 @@ export function QuizFlow({
         ))}
       </div>
 
-      {index > 0 ? (
+      {index > firstUnanswered ? (
         <button
           type="button"
           onClick={() => setIndex(index - 1)}

@@ -3,20 +3,24 @@
 import { useState, useTransition } from "react";
 import { ArchetypeExplainer } from "@/components/archetype-explainer";
 import { AxesChart } from "@/components/axes-chart";
-import { QuizFlow } from "@/components/quiz-flow";
+import { QuizFlow, type QuizSession } from "@/components/quiz-flow";
 import type { FlavorAxes } from "@/lib/flavor/axes";
-import type { QuizResult } from "@/lib/flavor/scoring";
+import { CORE_QUIZ, type QuizQuestion } from "@/lib/flavor/quiz";
+import { pickDeeperRound, type QuizResult } from "@/lib/flavor/scoring";
 import { namePublicQuizResult, savePublicQuizResult } from "./actions";
 
 type Saved = { axes: FlavorAxes; archetype: string; token: string };
 
 export function TasteQuiz() {
   const [started, setStarted] = useState(false);
+  const [questions, setQuestions] = useState<QuizQuestion[]>(CORE_QUIZ);
+  const [session, setSession] = useState<QuizSession | null>(null);
   const [saved, setSaved] = useState<Saved | null>(null);
+  const [deepening, setDeepening] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, startSaving] = useTransition();
 
-  function handleScored(scored: QuizResult) {
+  function handleScored(scored: QuizResult, s: QuizSession) {
     startSaving(async () => {
       const res = await savePublicQuizResult(
         "",
@@ -28,11 +32,25 @@ export function TasteQuiz() {
         setError(res.error ?? "Couldn't save that result.");
         return;
       }
+      setSession(s);
+      setDeepening(false);
       setSaved({ axes: scored.axes, archetype: scored.archetype, token: res.token });
     });
   }
 
-  if (saved) return <Result saved={saved} />;
+  function goDeeper() {
+    if (!session) return;
+    const extra = pickDeeperRound(session.answers, session.asked);
+    if (extra.length === 0) return;
+    setQuestions([...session.asked, ...extra]);
+    setDeepening(true);
+    setSaved(null);
+  }
+
+  if (saved && session && !deepening) {
+    const deeperAvailable = pickDeeperRound(session.answers, session.asked).length;
+    return <Result saved={saved} onGoDeeper={deeperAvailable > 0 ? goDeeper : null} deeperCount={deeperAvailable} />;
+  }
 
   if (!started) {
     return (
@@ -66,10 +84,27 @@ export function TasteQuiz() {
     );
   }
 
-  return <QuizFlow onScored={handleScored} busy={busy} error={error} />;
+  return (
+    <QuizFlow
+      key={questions.length}
+      questions={questions}
+      initialAnswers={session?.answers ?? {}}
+      onScored={handleScored}
+      busy={busy}
+      error={error}
+    />
+  );
 }
 
-function Result({ saved }: { saved: Saved }) {
+function Result({
+  saved,
+  onGoDeeper,
+  deeperCount,
+}: {
+  saved: Saved;
+  onGoDeeper: (() => void) | null;
+  deeperCount: number;
+}) {
   const [name, setName] = useState("");
   const [copied, setCopied] = useState(false);
   const [namePending, startNaming] = useTransition();
@@ -109,6 +144,21 @@ function Result({ saved }: { saved: Saved }) {
       <AxesChart axes={saved.axes} />
 
       <ArchetypeExplainer axes={saved.axes} archetype={saved.archetype} />
+
+      {onGoDeeper ? (
+        <div className="flex flex-col gap-1.5">
+          <button
+            type="button"
+            onClick={onGoDeeper}
+            className="self-start rounded-xl bg-neutral-100 px-5 py-2.5 text-sm font-medium dark:bg-neutral-900"
+          >
+            Sharpen it — {deeperCount} more question{deeperCount === 1 ? "" : "s"}
+          </button>
+          <p className="text-xs text-neutral-500">
+            Aimed at whichever spectra are still blurriest. Your result above is already saved.
+          </p>
+        </div>
+      ) : null}
 
       <div className="flex flex-col gap-3 rounded-xl bg-neutral-100 p-4 dark:bg-neutral-900">
         <p className="text-sm font-medium">Send this to whoever cooks for you</p>
