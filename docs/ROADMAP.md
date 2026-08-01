@@ -123,9 +123,11 @@ fall out of that one dinner:
 - **The effort dial.** (Alex, 2026-07-31) Preference-matching must never make dinner
   harder for someone who's just trying to get food on the table. Splitting the pasta is
   for the night you have the bandwidth; a parent cooking for 3 kids may want one pot,
-  period. So per-cook, the chef should ask (or remember) an effort level — "quick and
-  done" vs "match everyone tonight" — and only propose forks in the steps when invited.
-  Same household, different nights, different answers.
+  period. So per-cook, the chef should ask (or remember) an effort level — **"Quick and
+  done"** vs **"Cooked to order"** — and only propose forks in the steps when invited.
+  (Borrowed from restaurant vernacular: *to order* means each plate made to that diner's
+  spec instead of batched — exactly the distinction, and it reads as care rather than
+  extra work.) Same household, different nights, different answers.
 - **Kid profiles: texture and structure, not just flavor.** (Alex, 2026-07-31, from his
   4½-year-old) The seven flavor axes measure *taste*, but picky eating is often about
   *structure and texture*: her foods must not be mixed (plain noodles = great, sauced
