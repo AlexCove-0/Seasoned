@@ -26,46 +26,70 @@ function GoogleIcon() {
   );
 }
 
+function FacebookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+      <path
+        fill="#1877F2"
+        d="M24 12.07C24 5.68 18.63.5 12 .5S0 5.68 0 12.07c0 5.77 4.39 10.56 10.13 11.43v-8.08H7.08v-3.35h3.05V9.41c0-2.99 1.79-4.64 4.53-4.64 1.31 0 2.68.23 2.68.23v2.92h-1.51c-1.49 0-1.95.92-1.95 1.86v2.24h3.32l-.53 3.35h-2.79v8.08C19.61 22.63 24 17.84 24 12.07Z"
+      />
+    </svg>
+  );
+}
+
+type Provider = "google" | "facebook";
+
 export default function LoginPage() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<Provider | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function signInWithGoogle() {
-    setLoading(true);
+  async function signIn(provider: Provider) {
+    setLoading(provider);
     setError(null);
     const supabase = createClient();
     // Carry a ?next= destination (e.g. an invite's join link) through the
     // OAuth round trip; /auth/confirm redirects there after sign-in.
     const next = new URLSearchParams(window.location.search).get("next") ?? "/";
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
+      provider,
       options: {
         redirectTo: `${window.location.origin}/auth/confirm?next=${encodeURIComponent(next)}`,
       },
     });
     if (error) {
       setError(error.message);
-      setLoading(false);
+      setLoading(null);
     }
-    // On success the browser navigates away to Google, so nothing left to do here.
+    // On success the browser navigates away to the provider, so nothing left to do here.
   }
 
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4">
-      <div>
+      <div className="text-center">
         <h1 className="text-2xl font-semibold">Sazón</h1>
         <p className="text-sm text-neutral-500">Your personal chef instructor.</p>
       </div>
 
-      <button
-        type="button"
-        onClick={signInWithGoogle}
-        disabled={loading}
-        className="flex items-center justify-center gap-2 rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium disabled:opacity-50 dark:border-neutral-700"
-      >
-        <GoogleIcon />
-        {loading ? "Redirecting..." : "Continue with Google"}
-      </button>
+      <div className="flex flex-col gap-3">
+        <button
+          type="button"
+          onClick={() => signIn("google")}
+          disabled={loading !== null}
+          className="flex items-center justify-center gap-2 rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium disabled:opacity-50 dark:border-neutral-700"
+        >
+          <GoogleIcon />
+          {loading === "google" ? "Redirecting..." : "Continue with Google"}
+        </button>
+        <button
+          type="button"
+          onClick={() => signIn("facebook")}
+          disabled={loading !== null}
+          className="flex items-center justify-center gap-2 rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium disabled:opacity-50 dark:border-neutral-700"
+        >
+          <FacebookIcon />
+          {loading === "facebook" ? "Redirecting..." : "Continue with Facebook"}
+        </button>
+      </div>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
     </main>
   );
