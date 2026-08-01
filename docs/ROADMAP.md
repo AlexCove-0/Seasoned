@@ -142,6 +142,14 @@ fall out of that one dinner:
     meal for one diner is cheap when the recipe knows to do it.
   - A kid-appropriate way to *capture* this (parent fills it in, or a fun mini-quiz)
     is its own design question.
+- **Selective eating & sensory needs** — researched 2026-07-31, full writeup in
+  [selective-eating.md](selective-eating.md). Short version: texture drives refusal far
+  more than flavor for autistic/ARFID kids; the evidence-based toolkit is food chaining,
+  SOS-style desensitization, Satter's Division of Responsibility, and 12–15 neutral
+  exposures; pressure reliably backfires, so Sazón counts *offers*, never *eating*.
+  Feature directions: safe-foods list + texture/structure flags on profiles, fork steps
+  in generated recipes ("pull her portion now — before the sauce"), optional bridge-food
+  suggestions, an exposure log. Positioning: supports home practice, is not therapy.
 - **Standalone, shareable taste quiz.** (Alex, 2026-07-31) Not everyone will install
   the app. Some people just want to take the taste test — for fun, or to hand the
   result to whoever cooks for them. Make the flavor quiz work logged-out: public URL,
