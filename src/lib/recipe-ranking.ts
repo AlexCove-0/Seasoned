@@ -2,6 +2,7 @@ export type RankedRecipe = {
   id: string;
   title: string;
   base_servings: number;
+  image_path: string | null;
   cook_logs: { rating: number | null; cooked_at: string }[];
 };
 
@@ -9,6 +10,7 @@ export type RecipeCardData = {
   id: string;
   title: string;
   base_servings: number;
+  image_path: string | null;
   subtitle: string;
 };
 
@@ -28,6 +30,7 @@ export function topRecipes(recipes: RankedRecipe[], limit = 8): RecipeCardData[]
     id: recipe.id,
     title: recipe.title,
     base_servings: recipe.base_servings,
+    image_path: recipe.image_path,
     subtitle:
       avgRating > 0
         ? `${avgRating.toFixed(1)}★ · cooked ${cookCount}x`
@@ -66,6 +69,7 @@ export function recommendedRecipes(
     id: recipe.id,
     title: recipe.title,
     base_servings: recipe.base_servings,
+    image_path: recipe.image_path,
     subtitle: lastCooked ? `Last made ${new Date(lastCooked).toLocaleDateString()}` : "Never made yet",
   }));
 }

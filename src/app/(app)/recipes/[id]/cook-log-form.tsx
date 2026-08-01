@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
+import { PhotoPicker } from "@/components/photo-picker";
 import { logCook } from "./actions";
 
 const inputClass =
@@ -8,14 +9,17 @@ const inputClass =
 
 export function CookLogForm({
   recipeId,
+  householdId,
   defaultServings,
 }: {
   recipeId: string;
+  householdId: string;
   defaultServings: number;
 }) {
   const [state, formAction, pending] = useActionState(logCook.bind(null, recipeId), {
     error: null,
   });
+  const [imagePath, setImagePath] = useState<string | null>(null);
 
   return (
     <form action={formAction} className="flex flex-col gap-3 rounded-lg border border-neutral-300 p-4 dark:border-neutral-700">
@@ -54,6 +58,18 @@ export function CookLogForm({
           className={inputClass}
         />
       </label>
+
+      <div className="flex flex-col gap-1 text-sm">
+        How it turned out
+        <input type="hidden" name="imagePath" value={imagePath ?? ""} />
+        <PhotoPicker
+          householdId={householdId}
+          onUploaded={setImagePath}
+          label="Add a photo of tonight's plate"
+          aspect="aspect-[3/2]"
+        />
+      </div>
+
       <button
         type="submit"
         disabled={pending}

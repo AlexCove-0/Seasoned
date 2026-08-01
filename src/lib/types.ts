@@ -8,6 +8,7 @@ export type Recipe = {
   steps: Step[];
   base_servings: number;
   created_at: string;
+  image_path: string | null;
 };
 
 export type CookLog = {
@@ -17,6 +18,7 @@ export type CookLog = {
   adjustments: string | null;
   rating: number | null;
   notes: string | null;
+  image_path: string | null;
 };
 
 export type RecipeRating = {

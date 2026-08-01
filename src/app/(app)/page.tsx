@@ -18,13 +18,21 @@ export default async function Home() {
 
   const { data: recipes } = await supabase
     .from("recipes")
-    .select("id, title, base_servings, created_at")
+    .select("id, title, base_servings, created_at, image_path")
     .order("created_at", { ascending: false })
-    .returns<{ id: string; title: string; base_servings: number; created_at: string }[]>();
+    .returns<
+      {
+        id: string;
+        title: string;
+        base_servings: number;
+        created_at: string;
+        image_path: string | null;
+      }[]
+    >();
 
   const { data: recipesWithLogs } = await supabase
     .from("recipes")
-    .select("id, title, base_servings, cook_logs(rating, cooked_at)")
+    .select("id, title, base_servings, image_path, cook_logs(rating, cooked_at)")
     .returns<RankedRecipe[]>();
 
   const ranked = recipesWithLogs ?? [];

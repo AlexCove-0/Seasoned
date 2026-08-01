@@ -44,6 +44,7 @@ export async function logCook(
   const ratingRaw = String(formData.get("rating") ?? "").trim();
   const adjustments = String(formData.get("adjustments") ?? "").trim();
   const notes = String(formData.get("notes") ?? "").trim();
+  const imagePath = String(formData.get("imagePath") ?? "").trim();
 
   const { error } = await supabase.from("cook_logs").insert({
     recipe_id: recipeId,
@@ -51,6 +52,7 @@ export async function logCook(
     rating: ratingRaw ? Number(ratingRaw) : null,
     adjustments: adjustments || null,
     notes: notes || null,
+    image_path: imagePath || null,
     created_by: user.id,
   });
 
@@ -58,6 +60,20 @@ export async function logCook(
 
   revalidatePath(`/recipes/${recipeId}`);
   return { error: null };
+}
+
+export async function setRecipePhoto(recipeId: string, path: string | null) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  // RLS scopes the update to the caller's household; no extra check needed.
+  await supabase.from("recipes").update({ image_path: path }).eq("id", recipeId);
+
+  revalidatePath(`/recipes/${recipeId}`);
+  revalidatePath("/");
 }
 
 export async function submitRating(

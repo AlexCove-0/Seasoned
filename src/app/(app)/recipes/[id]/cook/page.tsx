@@ -17,7 +17,7 @@ export default async function CookModePage({
 
   const { data: recipe } = await supabase
     .from("recipes")
-    .select("id, title, ingredients, steps, base_servings, created_at")
+    .select("id, title, ingredients, steps, base_servings, created_at, image_path")
     .eq("id", id)
     .maybeSingle<Recipe>();
 

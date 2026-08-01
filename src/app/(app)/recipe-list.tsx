@@ -2,8 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { photoUrl } from "@/lib/photos";
 
-type RecipeSummary = { id: string; title: string; base_servings: number };
+type RecipeSummary = {
+  id: string;
+  title: string;
+  base_servings: number;
+  image_path: string | null;
+};
 
 export function RecipeList({ recipes }: { recipes: RecipeSummary[] }) {
   const [query, setQuery] = useState("");
@@ -32,9 +38,20 @@ export function RecipeList({ recipes }: { recipes: RecipeSummary[] }) {
             <li key={r.id}>
               <Link
                 href={`/recipes/${r.id}`}
-                className="flex items-center justify-between rounded-xl bg-neutral-100 px-4 py-3 text-sm transition-colors hover:bg-neutral-200 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+                className="flex items-center gap-3 rounded-xl bg-neutral-100 p-2 pr-4 text-sm transition-colors hover:bg-neutral-200 dark:bg-neutral-900 dark:hover:bg-neutral-800"
               >
-                <span>{r.title}</span>
+                {r.image_path ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={photoUrl(r.image_path)}
+                    alt=""
+                    className="h-12 w-12 shrink-0 rounded-lg object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <span className="h-12 w-12 shrink-0 rounded-lg bg-neutral-200 dark:bg-neutral-800" />
+                )}
+                <span className="flex-1">{r.title}</span>
                 <span className="text-xs text-neutral-500">Serves {r.base_servings}</span>
               </Link>
             </li>

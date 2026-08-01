@@ -3,7 +3,9 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
 import type { CookLog, Recipe, RecipeRating } from "@/lib/types";
+import { photoUrl } from "@/lib/photos";
 import { CookLogForm } from "./cook-log-form";
+import { RecipePhoto } from "./recipe-photo";
 import { RecipeIngredients } from "./recipe-ingredients";
 import { RecipeSteps } from "./recipe-steps";
 import { RecipeRatings } from "./recipe-ratings";
@@ -26,7 +28,7 @@ export default async function RecipePage({
 
   const { data: recipe } = await supabase
     .from("recipes")
-    .select("id, title, ingredients, steps, base_servings, created_at")
+    .select("id, title, ingredients, steps, base_servings, created_at, image_path")
     .eq("id", id)
     .maybeSingle<Recipe>();
 
@@ -34,7 +36,7 @@ export default async function RecipePage({
 
   const { data: cookLogs } = await supabase
     .from("cook_logs")
-    .select("id, cooked_at, servings_made, adjustments, rating, notes")
+    .select("id, cooked_at, servings_made, adjustments, rating, notes, image_path")
     .eq("recipe_id", id)
     .order("cooked_at", { ascending: false })
     .returns<CookLog[]>();
@@ -96,6 +98,12 @@ export default async function RecipePage({
         <p className="text-sm text-neutral-500">Serves {recipe.base_servings}</p>
       </div>
 
+      <RecipePhoto
+        recipeId={recipe.id}
+        householdId={household.id}
+        imagePath={recipe.image_path}
+      />
+
       <Link
         href={`/recipes/${recipe.id}/cook`}
         className="rounded-md bg-accent-600 px-4 py-3 text-center text-sm font-medium text-white dark:bg-accent-400 dark:text-white"
@@ -114,7 +122,13 @@ export default async function RecipePage({
         guestRatings={guestRatings ?? []}
       />
 
-      <CookLogForm recipeId={recipe.id} defaultServings={recipe.base_servings} />
+      <CookLogForm
+        // Remounting on a new log clears the form, including its photo.
+        key={cookLogs?.length ?? 0}
+        recipeId={recipe.id}
+        householdId={household.id}
+        defaultServings={recipe.base_servings}
+      />
 
       <section>
         <h2 className="mb-2 text-lg font-medium">Cook history</h2>
@@ -131,6 +145,15 @@ export default async function RecipePage({
                   <span>{new Date(log.cooked_at).toLocaleDateString()}</span>
                   {log.rating ? <span>{"★".repeat(log.rating)}</span> : null}
                 </div>
+                {log.image_path ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={photoUrl(log.image_path)}
+                    alt={`Cooked on ${new Date(log.cooked_at).toLocaleDateString()}`}
+                    className="mt-2 aspect-[3/2] w-full rounded-lg object-cover"
+                    loading="lazy"
+                  />
+                ) : null}
                 {log.adjustments ? <p className="mt-1">Adjusted: {log.adjustments}</p> : null}
                 {log.notes ? <p className="mt-1 text-neutral-500">{log.notes}</p> : null}
               </li>
