@@ -116,6 +116,44 @@ export function archetypeFor(axes: FlavorAxes): string {
 }
 
 /**
+ * Reads the vector back as a portrait of how someone eats -- what they reach
+ * for, what to go easy on -- rather than as scores. Ordered by how far each
+ * axis sits from average, so the most characteristic thing leads.
+ */
+export type ProfileTrait = {
+  axisName: string;
+  /** Short food-language claim, e.g. "loves richness". */
+  claim: string;
+  /** The concrete examples behind it, when the phrase carries them. */
+  examples: string | null;
+  distance: number;
+  /** Above the midpoint on this axis. */
+  high: boolean;
+  /** Far enough out to be a defining trait rather than a mild lean. */
+  strong: boolean;
+};
+
+export function describeProfile(axes: FlavorAxes): ProfileTrait[] {
+  return AXES.map((axis) => {
+    const value = axes[axis.id];
+    const distance = Math.abs(value - 50);
+    const high = value >= 50;
+    const phrase = high ? axis.highPhrase : axis.lowPhrase;
+    const [claim, ...rest] = phrase.split("--");
+    return {
+      axisName: axis.name,
+      claim: claim.trim(),
+      examples: rest.join("--").trim() || null,
+      distance,
+      high,
+      strong: distance >= 20,
+    };
+  })
+    .filter((t) => t.distance >= 8)
+    .sort((a, b) => b.distance - a.distance);
+}
+
+/**
  * Turns the vector into prose for the chef prompt. The model reasons about
  * intensity far better than it does about a bare tag list -- and the
  * archetype name is deliberately never sent, only the underlying numbers.

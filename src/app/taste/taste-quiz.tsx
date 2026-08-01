@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { ArchetypeExplainer } from "@/components/archetype-explainer";
 import { AxesChart } from "@/components/axes-chart";
 import { QuizFlow } from "@/components/quiz-flow";
 import type { FlavorAxes } from "@/lib/flavor/axes";
@@ -106,6 +107,8 @@ function Result({ saved }: { saved: Saved }) {
       </div>
 
       <AxesChart axes={saved.axes} />
+
+      <ArchetypeExplainer axes={saved.axes} archetype={saved.archetype} />
 
       <div className="flex flex-col gap-3 rounded-xl bg-neutral-100 p-4 dark:bg-neutral-900">
         <p className="text-sm font-medium">Send this to whoever cooks for you</p>

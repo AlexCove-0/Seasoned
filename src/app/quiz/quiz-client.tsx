@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
+import { ArchetypeExplainer } from "@/components/archetype-explainer";
 import { AxesChart } from "@/components/axes-chart";
 import { QuizFlow } from "@/components/quiz-flow";
 import type { FlavorAxes } from "@/lib/flavor/axes";
@@ -52,6 +53,8 @@ export function QuizClient({
         </div>
 
         <AxesChart axes={result.axes} previous={previous?.axes ?? null} />
+
+        <ArchetypeExplainer axes={result.axes} archetype={result.archetype} />
 
         <p className="text-sm text-neutral-500">
           {previous
