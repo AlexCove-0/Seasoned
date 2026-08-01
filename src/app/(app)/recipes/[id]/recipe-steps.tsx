@@ -78,6 +78,11 @@ export function RecipeSteps({ recipeId, steps }: { recipeId: string; steps: Step
                   {isDone ? "✓" : i + 1}
                 </span>
                 <span className="flex flex-col gap-1">
+                  {step.for_diner ? (
+                    <span className="self-start rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold tracking-wide text-blue-800 uppercase dark:bg-blue-950 dark:text-blue-300">
+                      For {step.for_diner}
+                    </span>
+                  ) : null}
                   <span
                     className={
                       isDone

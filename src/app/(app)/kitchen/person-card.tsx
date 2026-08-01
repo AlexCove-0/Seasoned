@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState, useEffect, useState, useTransition } from "react";
 import { TagPicker } from "@/components/tag-picker";
 import { TastePicker } from "@/components/taste-picker";
+import { PickyEaterFields } from "@/components/picky-eater-fields";
 import { TASTE_PREFERENCES, COMMON_ALLERGENS } from "@/lib/taste-options";
 import { monthsSince, STALE_AFTER_MONTHS } from "@/lib/flavor/scoring";
 import { updatePerson, toggleFavorite } from "./profile-actions";
@@ -14,12 +15,14 @@ const inputClass =
 const buttonClass =
   "rounded-lg bg-accent-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 dark:bg-accent-400";
 
-type ChipColor = "green" | "red" | "yellow";
+type ChipColor = "green" | "red" | "yellow" | "blue";
 
 const chipColorClass: Record<ChipColor, string> = {
   green: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
   red: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
   yellow: "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300",
+  // Serving rules are instructions, not warnings -- deliberately not red.
+  blue: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
 };
 
 function FlavorQuizRow({
@@ -169,6 +172,34 @@ export function PersonCard({ member }: { member: Member }) {
               <ChipRow tags={member.allergies} color="yellow" />
             </dd>
           </div>
+          {member.is_picky_eater ? (
+            <>
+              {member.safe_foods.length > 0 ? (
+                <div className="flex gap-2">
+                  <dt className="w-24 shrink-0 text-neutral-500">Safe foods</dt>
+                  <dd>
+                    <ChipRow tags={member.safe_foods} color="green" />
+                  </dd>
+                </div>
+              ) : null}
+              {member.avoid_textures.length > 0 ? (
+                <div className="flex gap-2">
+                  <dt className="w-24 shrink-0 text-neutral-500">Avoid</dt>
+                  <dd>
+                    <ChipRow tags={member.avoid_textures} color="red" />
+                  </dd>
+                </div>
+              ) : null}
+              {member.structure_rules.length > 0 ? (
+                <div className="flex gap-2">
+                  <dt className="w-24 shrink-0 text-neutral-500">Serving</dt>
+                  <dd>
+                    <ChipRow tags={member.structure_rules} color="blue" />
+                  </dd>
+                </div>
+              ) : null}
+            </>
+          ) : null}
         </dl>
       </div>
     );
@@ -201,6 +232,15 @@ export function PersonCard({ member }: { member: Member }) {
         label="Food allergies"
         suggestions={COMMON_ALLERGENS}
         defaultValue={member.allergies}
+      />
+      <PickyEaterFields
+        personName={member.display_name}
+        defaults={{
+          isPickyEater: member.is_picky_eater,
+          safeFoods: member.safe_foods,
+          avoidTextures: member.avoid_textures,
+          structureRules: member.structure_rules,
+        }}
       />
       <div className="flex gap-2">
         <button

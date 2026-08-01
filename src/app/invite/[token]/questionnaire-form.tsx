@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { TagPicker } from "@/components/tag-picker";
 import { TastePicker } from "@/components/taste-picker";
+import { PickyEaterFields } from "@/components/picky-eater-fields";
 import { TASTE_PREFERENCES, COMMON_ALLERGENS } from "@/lib/taste-options";
 import { submitTasteQuestionnaire } from "./actions";
 
@@ -65,8 +66,14 @@ export function QuestionnaireForm({
         const tastePreferences = formData.getAll("tastePreferences").map(String);
         const dislikedTastes = formData.getAll("dislikedTastes").map(String);
         const allergies = formData.getAll("allergies").map(String);
+        const picky = {
+          isPickyEater: formData.get("isPickyEater") === "on",
+          safeFoods: formData.getAll("safeFoods").map(String),
+          avoidTextures: formData.getAll("avoidTextures").map(String),
+          structureRules: formData.getAll("structureRules").map(String),
+        };
         startTransition(async () => {
-          const result = await submitTasteQuestionnaire(token, tastePreferences, dislikedTastes, allergies);
+          const result = await submitTasteQuestionnaire(token, tastePreferences, dislikedTastes, allergies, picky);
           if (result.error) setError(result.error);
           else setSubmitted(true);
         });
@@ -80,6 +87,7 @@ export function QuestionnaireForm({
         suggestions={TASTE_PREFERENCES}
       />
       <TagPicker name="allergies" label="Food allergies" suggestions={COMMON_ALLERGENS} />
+      <PickyEaterFields />
       <button
         type="submit"
         disabled={pending}

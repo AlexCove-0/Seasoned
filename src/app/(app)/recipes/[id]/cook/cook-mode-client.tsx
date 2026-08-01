@@ -194,6 +194,16 @@ export function CookModeClient({ recipe }: { recipe: Recipe }) {
       <IngredientsDrawer recipe={recipe} />
 
       <div className="flex flex-1 flex-col justify-center gap-4">
+        {/* The whole point of a fork step is that it's easy to blow past
+            while juggling dinner, so it gets loud treatment rather than
+            sitting inline like every other instruction. */}
+        {step.for_diner ? (
+          <div className="rounded-xl bg-blue-100 p-4 dark:bg-blue-950">
+            <p className="text-xs font-semibold tracking-[0.12em] text-blue-800 uppercase dark:text-blue-300">
+              Don&apos;t miss this — for {step.for_diner}
+            </p>
+          </div>
+        ) : null}
         <p className="text-2xl leading-snug font-medium">{step.instruction}</p>
         {step.technique_note ? (
           <p className="rounded-lg bg-neutral-100 p-4 text-lg text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">

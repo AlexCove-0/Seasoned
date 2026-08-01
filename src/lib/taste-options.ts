@@ -21,6 +21,39 @@ export const TASTE_PREFERENCES = [
   "Earthy",
 ] as const;
 
+// Textures that commonly end a meal for a selective eater. Phrased as the
+// thing to avoid, so the chef can read them straight as constraints.
+export const AVOID_TEXTURES = [
+  "Mushy",
+  "Slimy",
+  "Gritty",
+  "Stringy",
+  "Chewy",
+  "Crunchy",
+  "Lumpy",
+  "Mixed textures",
+  "Soggy",
+  "Dry",
+  "Sticky",
+  "Skins on fruit/veg",
+  "Seeds",
+  "Sauces & gravies",
+] as const;
+
+// How food is presented, which for many kids matters more than what it is.
+export const STRUCTURE_RULES = [
+  "Foods can't touch",
+  "Components served separately",
+  "Sauce on the side",
+  "Plain portion, unseasoned",
+  "No visible herbs or spices",
+  "One food at a time",
+  "Cut into small pieces",
+  "Served whole, not cut",
+  "Warm, not hot",
+  "Same plate/bowl every time",
+] as const;
+
 export const COMMON_ALLERGENS = [
   "Peanuts",
   "Tree nuts",

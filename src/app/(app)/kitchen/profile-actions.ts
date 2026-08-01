@@ -6,6 +6,21 @@ import { getCurrentHousehold } from "@/lib/household";
 
 type State = { error: string | null };
 
+/**
+ * Picky-eater fields only mean something while the toggle is on, so turning
+ * it off clears the follow-ups rather than leaving stale constraints that
+ * would keep steering recipes invisibly.
+ */
+function readPickyEaterFields(formData: FormData) {
+  const isPickyEater = formData.get("isPickyEater") === "on";
+  return {
+    is_picky_eater: isPickyEater,
+    safe_foods: isPickyEater ? formData.getAll("safeFoods").map(String) : [],
+    avoid_textures: isPickyEater ? formData.getAll("avoidTextures").map(String) : [],
+    structure_rules: isPickyEater ? formData.getAll("structureRules").map(String) : [],
+  };
+}
+
 export async function addPerson(_prevState: State, formData: FormData): Promise<State> {
   const displayName = String(formData.get("displayName") ?? "").trim();
   if (!displayName) return { error: "Enter a name." };
@@ -17,6 +32,7 @@ export async function addPerson(_prevState: State, formData: FormData): Promise<
   const dislikedTastes = formData.getAll("dislikedTastes").map(String);
   const allergies = formData.getAll("allergies").map(String);
   const isFavorite = formData.get("isFavorite") === "on";
+  const picky = readPickyEaterFields(formData);
 
   const supabase = await createClient();
   const { error } = await supabase.from("household_members").insert({
@@ -27,6 +43,7 @@ export async function addPerson(_prevState: State, formData: FormData): Promise<
     disliked_tastes: dislikedTastes,
     allergies,
     is_favorite: isFavorite,
+    ...picky,
   });
 
   if (error) return { error: error.message };
@@ -44,6 +61,7 @@ export async function updatePerson(_prevState: State, formData: FormData): Promi
   const dislikedTastes = formData.getAll("dislikedTastes").map(String);
   const allergies = formData.getAll("allergies").map(String);
   const isFavorite = formData.get("isFavorite") === "on";
+  const picky = readPickyEaterFields(formData);
 
   const supabase = await createClient();
   const { error } = await supabase
@@ -54,6 +72,7 @@ export async function updatePerson(_prevState: State, formData: FormData): Promi
       disliked_tastes: dislikedTastes,
       allergies,
       is_favorite: isFavorite,
+      ...picky,
     })
     .eq("id", memberId);
 
@@ -76,6 +95,7 @@ export async function updatePerson(_prevState: State, formData: FormData): Promi
       taste_preferences: tastePreferences,
       disliked_tastes: dislikedTastes,
       allergies,
+      ...picky,
       updated_at: new Date().toISOString(),
     });
   }

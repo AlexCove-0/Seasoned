@@ -4,7 +4,7 @@ export type RecipeDraft = {
   title: string;
   base_servings: number;
   ingredients: { name: string; quantity: number | null; unit: string | null }[];
-  steps: { instruction: string; technique_note: string | null }[];
+  steps: { instruction: string; technique_note: string | null; for_diner: string | null }[];
 };
 
 export const PROPOSE_RECIPE_TOOL: Anthropic.Tool = {
@@ -45,8 +45,13 @@ export const PROPOSE_RECIPE_TOOL: Anthropic.Tool = {
               description:
                 "The chef-instructor detail behind this step: timing, temperature, sensory cues, why it matters, or a pitfall to avoid.",
             },
+            for_diner: {
+              type: ["string", "null"],
+              description:
+                "Set to a diner's name ONLY when this step exists to accommodate that one person -- e.g. pulling their portion out before saucing. The app highlights these so the cook doesn't miss the moment. Null for normal steps.",
+            },
           },
-          required: ["instruction", "technique_note"],
+          required: ["instruction", "technique_note", "for_diner"],
         },
       },
     },

@@ -43,16 +43,20 @@ export async function POST(request: Request) {
     allergies: string[];
     flavor_axes: FlavorAxes | null;
     texture_flags: string[] | null;
+    is_picky_eater: boolean | null;
+    safe_foods: string[] | null;
+    avoid_textures: string[] | null;
+    structure_rules: string[] | null;
   }[] = [];
 
   if (Array.isArray(body.dinerIds) && body.dinerIds.length > 0) {
     const { data } = await supabase
       .from("household_members")
-      .select("display_name, taste_preferences, disliked_tastes, allergies, flavor_axes, texture_flags")
+      .select("display_name, taste_preferences, disliked_tastes, allergies, flavor_axes, texture_flags, is_picky_eater, safe_foods, avoid_textures, structure_rules")
       .eq("household_id", household.id)
       .in("id", body.dinerIds)
       .returns<
-        { display_name: string; taste_preferences: string[]; disliked_tastes: string[]; allergies: string[]; flavor_axes: FlavorAxes | null; texture_flags: string[] | null }[]
+        { display_name: string; taste_preferences: string[]; disliked_tastes: string[]; allergies: string[]; flavor_axes: FlavorAxes | null; texture_flags: string[] | null; is_picky_eater: boolean | null; safe_foods: string[] | null; avoid_textures: string[] | null; structure_rules: string[] | null }[]
       >();
     diners = data ?? [];
   }
@@ -69,7 +73,10 @@ export async function POST(request: Request) {
 
   const response = await anthropic.messages.create({
     model: CHEF_MODEL,
-    max_tokens: 4096,
+    // A full recipe is a long tool payload (technique notes on every step)
+    // on top of the prose reply; 4096 was getting cut mid-tool-call, which
+    // surfaced as recipes with no steps.
+    max_tokens: 8192,
     system,
     tools: [PROPOSE_RECIPE_TOOL],
     messages: messages.map((m) => ({ role: m.role, content: m.content })),
@@ -84,6 +91,13 @@ export async function POST(request: Request) {
     } else if (block.type === "tool_use" && block.name === "propose_recipe") {
       recipe = block.input as RecipeDraft;
     }
+  }
+
+  // A truncated tool call parses fine but is missing pieces -- never hand
+  // the UI a recipe it could save half-formed.
+  if (recipe && (!Array.isArray(recipe.steps) || recipe.steps.length === 0)) {
+    recipe = null;
+    if (!reply) reply = "That recipe came through incomplete — ask me to try again.";
   }
 
   return NextResponse.json({ reply, recipe });

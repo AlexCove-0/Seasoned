@@ -1,5 +1,14 @@
 export type Ingredient = { name: string; quantity: number | null; unit: string | null };
-export type Step = { instruction: string; technique_note: string | null };
+/**
+ * `for_diner` marks a step that exists to accommodate one person (pulling a
+ * portion before the sauce, plating theirs plain). Null on ordinary steps.
+ * Recipes saved before this existed simply won't have the field.
+ */
+export type Step = {
+  instruction: string;
+  technique_note: string | null;
+  for_diner?: string | null;
+};
 
 export type Recipe = {
   id: string;

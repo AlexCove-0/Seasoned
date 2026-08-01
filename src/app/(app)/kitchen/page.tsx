@@ -18,6 +18,10 @@ export type Member = {
   invite_token: string;
   flavor_archetype: string | null;
   quiz_taken_at: string | null;
+  is_picky_eater: boolean;
+  safe_foods: string[];
+  avoid_textures: string[];
+  structure_rules: string[];
 };
 
 export type ConnectedProfile = {
@@ -42,7 +46,7 @@ export default async function KitchenPage() {
   const { data: members } = await supabase
     .from("household_members")
     .select(
-      "id, user_id, display_name, taste_preferences, disliked_tastes, allergies, is_favorite, invite_token, flavor_archetype, quiz_taken_at",
+      "id, user_id, display_name, taste_preferences, disliked_tastes, allergies, is_favorite, invite_token, flavor_archetype, quiz_taken_at, is_picky_eater, safe_foods, avoid_textures, structure_rules",
     )
     .eq("household_id", household.id)
     .order("created_at", { ascending: true })

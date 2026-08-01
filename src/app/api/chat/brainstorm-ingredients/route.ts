@@ -36,16 +36,20 @@ export async function POST(request: Request) {
     allergies: string[];
     flavor_axes: FlavorAxes | null;
     texture_flags: string[] | null;
+    is_picky_eater: boolean | null;
+    safe_foods: string[] | null;
+    avoid_textures: string[] | null;
+    structure_rules: string[] | null;
   }[] = [];
 
   if (Array.isArray(body.dinerIds) && body.dinerIds.length > 0) {
     const { data } = await supabase
       .from("household_members")
-      .select("display_name, taste_preferences, disliked_tastes, allergies, flavor_axes, texture_flags")
+      .select("display_name, taste_preferences, disliked_tastes, allergies, flavor_axes, texture_flags, is_picky_eater, safe_foods, avoid_textures, structure_rules")
       .eq("household_id", household.id)
       .in("id", body.dinerIds)
       .returns<
-        { display_name: string; taste_preferences: string[]; disliked_tastes: string[]; allergies: string[]; flavor_axes: FlavorAxes | null; texture_flags: string[] | null }[]
+        { display_name: string; taste_preferences: string[]; disliked_tastes: string[]; allergies: string[]; flavor_axes: FlavorAxes | null; texture_flags: string[] | null; is_picky_eater: boolean | null; safe_foods: string[] | null; avoid_textures: string[] | null; structure_rules: string[] | null }[]
       >();
     diners = data ?? [];
   }

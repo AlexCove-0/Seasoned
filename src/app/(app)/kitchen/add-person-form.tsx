@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useState } from "react";
 import { TagPicker } from "@/components/tag-picker";
 import { TastePicker } from "@/components/taste-picker";
+import { PickyEaterFields } from "@/components/picky-eater-fields";
 import { TASTE_PREFERENCES, COMMON_ALLERGENS } from "@/lib/taste-options";
 import { addPerson } from "./profile-actions";
 
@@ -15,6 +16,9 @@ export function AddPersonForm() {
   const [open, setOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [formKey, setFormKey] = useState(0);
+  // Tracked so the picky-eater question can address the person by name as
+  // soon as it's typed ("Is Nora a picky eater?" instead of "Are you...").
+  const [name, setName] = useState("");
   const [state, formAction, pending] = useActionState(addPerson, { error: null });
 
   useEffect(() => {
@@ -49,6 +53,8 @@ export function AddPersonForm() {
           name="displayName"
           required
           placeholder="e.g. your daughter's name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           className={inputClass}
         />
       </label>
@@ -66,6 +72,7 @@ export function AddPersonForm() {
         suggestions={TASTE_PREFERENCES}
       />
       <TagPicker name="allergies" label="Food allergies" suggestions={COMMON_ALLERGENS} />
+      <PickyEaterFields personName={name} />
       <div className="flex gap-2">
         <button
           type="submit"

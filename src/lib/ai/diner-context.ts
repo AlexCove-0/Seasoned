@@ -8,6 +8,10 @@ type Diner = {
   allergies: string[];
   flavor_axes?: FlavorAxes | null;
   texture_flags?: string[] | null;
+  is_picky_eater?: boolean | null;
+  safe_foods?: string[] | null;
+  avoid_textures?: string[] | null;
+  structure_rules?: string[] | null;
 };
 
 type SessionContext = {
@@ -83,6 +87,22 @@ export function buildDinerContext({
       }
       if (d.texture_flags && d.texture_flags.length > 0) {
         lines.push(`    · texture notes: ${d.texture_flags.join(", ")}`);
+      }
+
+      // Selective eaters: structure and texture usually decide whether a
+      // plate gets eaten at all, so these read as constraints on how the
+      // food is served, not as flavor preferences to balance.
+      if (d.is_picky_eater) {
+        lines.push(`    · SELECTIVE EATER — keep their portion simple and separable.`);
+        if (d.safe_foods && d.safe_foods.length > 0) {
+          lines.push(`    · always-safe foods: ${d.safe_foods.join(", ")}`);
+        }
+        if (d.avoid_textures && d.avoid_textures.length > 0) {
+          lines.push(`    · textures to avoid: ${d.avoid_textures.join(", ")}`);
+        }
+        if (d.structure_rules && d.structure_rules.length > 0) {
+          lines.push(`    · how food must be served: ${d.structure_rules.join(", ")}`);
+        }
       }
     }
     const allAllergies = [...new Set(diners.flatMap((d) => d.allergies))];
