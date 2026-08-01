@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useActionState, useEffect, useState, useTransition } from "react";
+import { AxesEditor } from "@/components/axes-editor";
 import { CollapsibleRow } from "@/components/collapsible-row";
+import { saveAxisAdjustment } from "@/app/quiz/actions";
 import { TagPicker } from "@/components/tag-picker";
 import { TastePicker } from "@/components/taste-picker";
 import { PickyEaterFields } from "@/components/picky-eater-fields";
@@ -134,6 +136,10 @@ function TasteDetails({ member }: { member: Member }) {
           </div>
         ) : null}
 
+        <div className="border-t border-neutral-200 pt-3 dark:border-neutral-800">
+          <AxisAdjuster member={member} />
+        </div>
+
         {hasPicky ? (
           <div className="flex flex-col gap-1.5 border-t border-neutral-200 pt-3 dark:border-neutral-800">
             {member.safe_foods.length > 0 ? (
@@ -158,6 +164,48 @@ function TasteDetails({ member }: { member: Member }) {
         ) : null}
       </div>
     </CollapsibleRow>
+  );
+}
+
+/** Lets someone correct the quiz's read of them without retaking it. */
+function AxisAdjuster({ member }: { member: Member }) {
+  const [open, setOpen] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [pending, startTransition] = useTransition();
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="text-xs text-neutral-500 underline underline-offset-2 hover:text-neutral-900 dark:hover:text-white"
+      >
+        {saved ? "Preferences saved ✓" : "Adjust these preferences"}
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <AxesEditor
+        initial={member.flavor_axes}
+        saving={pending}
+        onSave={(axes) =>
+          startTransition(async () => {
+            await saveAxisAdjustment(axes, member.id);
+            setSaved(true);
+            setOpen(false);
+          })
+        }
+      />
+      <button
+        type="button"
+        onClick={() => setOpen(false)}
+        className="self-start text-xs text-neutral-500 underline underline-offset-2"
+      >
+        Close
+      </button>
+    </div>
   );
 }
 

@@ -54,9 +54,13 @@ export function scoreQuiz(answers: QuizAnswers, asked: QuizQuestion[] = CORE_QUI
   for (const axis of AXES) {
     const score = raw.get(axis.id) ?? 0;
     const { max, min } = ranges.get(axis.id)!;
-    let position = 50;
-    if (score > 0 && max > 0) position = 50 + (score / max) * 50;
-    else if (score < 0 && min < 0) position = 50 - (score / min) * 50;
+
+    // One denominator for both directions. Scaling each half by its own
+    // range made lopsided axes behave wildly: when an axis could reach +12
+    // but only -2, a single -1 answer read as "half as negative as
+    // possible" and dropped someone to 25, while +1 barely moved them.
+    const span = Math.max(max, Math.abs(min));
+    const position = span > 0 ? 50 + (score / span) * 50 : 50;
     axes[axis.id] = Math.round(Math.min(100, Math.max(0, position)));
   }
 

@@ -55,7 +55,7 @@ export const CORE_QUIZ: QuizQuestion[] = [
     scene: "Calibration",
     prompt: "Where does the burn stop being fun and start being work?",
     options: [
-      { id: "bell", label: "Bell pepper", detail: "No heat at all, thanks.", weights: { heat: -2 } },
+      { id: "bell", label: "Bell pepper", detail: "No heat at all, thanks.", weights: { heat: -3 } },
       { id: "poblano", label: "Poblano", detail: "A whisper of warmth.", weights: { heat: -1 } },
       { id: "jalapeno", label: "Jalapeño", detail: "Pleasant, familiar heat.", weights: { heat: 1 } },
       { id: "serrano", label: "Serrano", detail: "Now we're talking.", weights: { heat: 2 } },
@@ -77,7 +77,9 @@ export const CORE_QUIZ: QuizQuestion[] = [
         id: "broccoli",
         label: "Charred broccolini",
         detail: "Blistered black at the edges, chili flake, lemon.",
-        weights: { bitter: 2, heat: 1, acid: 1 },
+        // No heat weight: people pick this for the char, and crediting it as
+        // chili tolerance was scoring bitter-lovers as heat seekers.
+        weights: { bitter: 2, acid: 1 },
       },
       {
         id: "slaw",
@@ -325,7 +327,9 @@ export const CORE_QUIZ: QuizQuestion[] = [
         id: "kimchi",
         label: "Fry it hard with kimchi",
         detail: "A fried egg, a big spoon of gochujang.",
-        weights: { funk: 2, heat: 1, adventure: 1 },
+        // Same reasoning as the broccolini: this is a funk choice, and
+        // kimchi's warmth is too mild to read as chili tolerance.
+        weights: { funk: 2, adventure: 1 },
       },
       {
         id: "lemon",
@@ -363,6 +367,73 @@ export const CORE_QUIZ: QuizQuestion[] = [
         label: "Get the thing I know is good",
         detail: "No regrets.",
         weights: { adventure: -2 },
+      },
+    ],
+  },
+  // q15 and q16 exist because heat and acid were previously inferred almost
+  // entirely from side effects -- charred greens and kimchi were quietly
+  // scoring people as chili chasers, and choosing a rich pan sauce over a
+  // squeeze of lemon was reading as "dislikes acidity". Both axes needed a
+  // question that asks the thing directly, in both directions.
+  {
+    id: "q15_chili_flakes",
+    scene: "There's a jar of chili flakes on the table",
+    prompt: "What happens to it?",
+    options: [
+      {
+        id: "never",
+        label: "It stays where it is",
+        detail: "Heat isn't something I add. The dish is the dish.",
+        weights: { heat: -3 },
+      },
+      {
+        id: "occasional",
+        label: "A pinch now and then",
+        detail: "Some dishes want it. Most don't.",
+        weights: { heat: -1 },
+      },
+      {
+        id: "usually",
+        label: "Most plates get a shake",
+        detail: "A little heat sharpens nearly anything.",
+        weights: { heat: 2 },
+      },
+      {
+        id: "always",
+        label: "First, and then again",
+        detail: "I'm building toward a burn.",
+        weights: { heat: 3, adventure: 1 },
+      },
+    ],
+  },
+  {
+    id: "q16_lemon_finish",
+    scene: "The food is cooked and plated, seconds from the table",
+    prompt: "Does it get a squeeze of lemon first?",
+    options: [
+      {
+        id: "always",
+        label: "Almost always",
+        detail: "Acid is how you wake a dish up. I keep citrus within reach.",
+        weights: { acid: 3 },
+      },
+      {
+        id: "rich_dishes",
+        label: "When it needs cutting",
+        detail: "Anything fatty, fried, or heavy gets it.",
+        weights: { acid: 1 },
+      },
+      {
+        id: "rarely",
+        label: "Rarely",
+        detail: "If I wanted it sharp I'd have built it that way.",
+        weights: { acid: -2 },
+      },
+      {
+        id: "never",
+        label: "No — it'd fight the dish",
+        detail: "I'd rather the flavors stay round and settled.",
+        weights: { acid: -3, richness: 1 },
       },
     ],
   },
@@ -541,4 +612,6 @@ export const TIE_BREAKERS: QuizQuestion[] = [
 
 export const ALL_QUESTIONS = [...CORE_QUIZ, ...TIE_BREAKERS];
 export const MAX_TIE_BREAKERS = 3;
-export const QUIZ_VERSION = 2;
+// 3: added direct heat/acid questions and made scoring symmetric, after
+// side-effect weights were mislabelling people (see q15/q16).
+export const QUIZ_VERSION = 3;
