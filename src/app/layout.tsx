@@ -40,7 +40,11 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      {/* Deliberately a block, not a flex column: `main` uses mx-auto, and
+          auto cross-axis margins stop a flex item from stretching, which
+          sized every page to its content instead of the viewport. Pages
+          carry their own min-h-screen. */}
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }
