@@ -120,6 +120,33 @@ fall out of that one dinner:
   who defers in ratings/notes) would let the chef weight tonight's compromise honestly.
   Related social patterns worth supporting someday: turn-taking ("whose night wins"),
   kids'-choice nights.
+- **The effort dial.** (Alex, 2026-07-31) Preference-matching must never make dinner
+  harder for someone who's just trying to get food on the table. Splitting the pasta is
+  for the night you have the bandwidth; a parent cooking for 3 kids may want one pot,
+  period. So per-cook, the chef should ask (or remember) an effort level — "quick and
+  done" vs "match everyone tonight" — and only propose forks in the steps when invited.
+  Same household, different nights, different answers.
+- **Kid profiles: texture and structure, not just flavor.** (Alex, 2026-07-31, from his
+  4½-year-old) The seven flavor axes measure *taste*, but picky eating is often about
+  *structure and texture*: her foods must not be mixed (plain noodles = great, sauced
+  noodles = ruined), loves cherry tomatoes and most fruit but not blueberries, lactose
+  intolerant. What that needs:
+  - Specific item likes/dislikes and intolerances already fit the existing profile
+    fields — that part works today.
+  - A structural/texture dimension does not exist yet: "components separate", "sauce on
+    the side", texture aversions (mushy, slimy...). Probably profile flags, not axes.
+  - The payoff connects to the effort dial and split-technique ideas: "plate hers before
+    saucing" is a one-line fork the chef can write into the steps — deconstructing a
+    meal for one diner is cheap when the recipe knows to do it.
+  - A kid-appropriate way to *capture* this (parent fills it in, or a fun mini-quiz)
+    is its own design question.
+- **Standalone, shareable taste quiz.** (Alex, 2026-07-31) Not everyone will install
+  the app. Some people just want to take the taste test — for fun, or to hand the
+  result to whoever cooks for them. Make the flavor quiz work logged-out: public URL,
+  take it, get your archetype + axes, share the result to the family cook (who *does*
+  use the app) or via a link. The invite questionnaire already proved the pattern of
+  public, no-login profile capture; this extends it to the full quiz and doubles as
+  the app's natural growth loop ("share with the person who actually cooks").
 - **Profiles that learn from cooking.** The quiz is a snapshot; the cook logs are the
   stream. But (Alex, 2026-07-31, "the Cholula problem"): behavior is context-bound while
   preferences are durable — someone who put hot sauce on everything for a week was
