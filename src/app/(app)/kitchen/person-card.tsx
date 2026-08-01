@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useActionState, useEffect, useState, useTransition } from "react";
+import { CollapsibleRow } from "@/components/collapsible-row";
 import { TagPicker } from "@/components/tag-picker";
 import { TastePicker } from "@/components/taste-picker";
 import { PickyEaterFields } from "@/components/picky-eater-fields";
 import { TASTE_PREFERENCES, COMMON_ALLERGENS } from "@/lib/taste-options";
-import { monthsSince, STALE_AFTER_MONTHS } from "@/lib/flavor/scoring";
+import { describeProfile, monthsSince, STALE_AFTER_MONTHS } from "@/lib/flavor/scoring";
 import { updatePerson, toggleFavorite } from "./profile-actions";
 import type { Member } from "./page";
 
@@ -74,6 +75,117 @@ function ChipRow({ tags, color }: { tags: string[]; color: ChipColor }) {
       ))}
     </span>
   );
+}
+
+/**
+ * Everything below the allergy line, folded away. Cards used to print every
+ * chip permanently, which made My Kitchen scroll forever once people had
+ * quiz results and picky-eater details on top of tags.
+ *
+ * When a quiz has been taken, its findings lead: they're calibrated
+ * intensities the chef actually reasons over, where the hand-entered
+ * like/dislike tags are a blunter instrument kept underneath.
+ */
+function TasteDetails({ member }: { member: Member }) {
+  const traits = member.flavor_axes ? describeProfile(member.flavor_axes) : [];
+  const seeksOut = traits.filter((t) => t.high);
+  const easyOn = traits.filter((t) => !t.high);
+
+  const hasTags = member.taste_preferences.length > 0 || member.disliked_tastes.length > 0;
+  const hasPicky =
+    member.is_picky_eater &&
+    (member.safe_foods.length > 0 ||
+      member.avoid_textures.length > 0 ||
+      member.structure_rules.length > 0);
+
+  if (traits.length === 0 && !hasTags && !hasPicky) {
+    return <p className="text-xs text-neutral-400">No taste details yet.</p>;
+  }
+
+  const summary =
+    traits.length > 0
+      ? capitalize(traits[0].claim)
+      : hasTags
+        ? `${member.taste_preferences.length + member.disliked_tastes.length} tags`
+        : "Serving notes";
+
+  return (
+    <CollapsibleRow label="Taste profile" summary={summary}>
+      <div className="flex flex-col gap-3 text-sm">
+        {seeksOut.length > 0 ? (
+          <TraitBlock title="Reaches for" traits={seeksOut} />
+        ) : null}
+        {easyOn.length > 0 ? <TraitBlock title="Go easy on" traits={easyOn} /> : null}
+
+        {hasTags ? (
+          <div className="flex flex-col gap-1.5">
+            {member.taste_preferences.length > 0 ? (
+              <div className="flex gap-2">
+                <span className="w-20 shrink-0 text-neutral-500">Likes</span>
+                <ChipRow tags={member.taste_preferences} color="green" />
+              </div>
+            ) : null}
+            {member.disliked_tastes.length > 0 ? (
+              <div className="flex gap-2">
+                <span className="w-20 shrink-0 text-neutral-500">Dislikes</span>
+                <ChipRow tags={member.disliked_tastes} color="red" />
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {hasPicky ? (
+          <div className="flex flex-col gap-1.5 border-t border-neutral-200 pt-3 dark:border-neutral-800">
+            {member.safe_foods.length > 0 ? (
+              <div className="flex gap-2">
+                <span className="w-20 shrink-0 text-neutral-500">Safe foods</span>
+                <ChipRow tags={member.safe_foods} color="green" />
+              </div>
+            ) : null}
+            {member.avoid_textures.length > 0 ? (
+              <div className="flex gap-2">
+                <span className="w-20 shrink-0 text-neutral-500">Avoid</span>
+                <ChipRow tags={member.avoid_textures} color="red" />
+              </div>
+            ) : null}
+            {member.structure_rules.length > 0 ? (
+              <div className="flex gap-2">
+                <span className="w-20 shrink-0 text-neutral-500">Serving</span>
+                <ChipRow tags={member.structure_rules} color="blue" />
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    </CollapsibleRow>
+  );
+}
+
+function TraitBlock({
+  title,
+  traits,
+}: {
+  title: string;
+  traits: ReturnType<typeof describeProfile>;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-[11px] font-semibold tracking-[0.1em] text-neutral-500 uppercase">
+        {title}
+      </span>
+      <ul className="flex flex-col gap-0.5">
+        {traits.map((t) => (
+          <li key={t.axisName} className={t.strong ? "font-medium" : ""}>
+            {capitalize(t.claim)}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 export function PersonCard({ member }: { member: Member }) {
@@ -153,54 +265,17 @@ export function PersonCard({ member }: { member: Member }) {
           hasProfile={Boolean(member.flavor_archetype)}
           takenAt={member.quiz_taken_at}
         />
-        <dl className="flex flex-col gap-1.5">
-          <div className="flex gap-2">
-            <dt className="w-24 shrink-0 text-neutral-500">Likes</dt>
-            <dd>
-              <ChipRow tags={member.taste_preferences} color="green" />
-            </dd>
+
+        {/* Allergies never collapse -- everything else here is preference,
+            this one is safety, and it has to be readable without a tap. */}
+        {member.allergies.length > 0 ? (
+          <div className="mb-2 flex gap-2">
+            <span className="w-20 shrink-0 text-neutral-500">Allergies</span>
+            <ChipRow tags={member.allergies} color="yellow" />
           </div>
-          <div className="flex gap-2">
-            <dt className="w-24 shrink-0 text-neutral-500">Dislikes</dt>
-            <dd>
-              <ChipRow tags={member.disliked_tastes} color="red" />
-            </dd>
-          </div>
-          <div className="flex gap-2">
-            <dt className="w-24 shrink-0 text-neutral-500">Allergies</dt>
-            <dd>
-              <ChipRow tags={member.allergies} color="yellow" />
-            </dd>
-          </div>
-          {member.is_picky_eater ? (
-            <>
-              {member.safe_foods.length > 0 ? (
-                <div className="flex gap-2">
-                  <dt className="w-24 shrink-0 text-neutral-500">Safe foods</dt>
-                  <dd>
-                    <ChipRow tags={member.safe_foods} color="green" />
-                  </dd>
-                </div>
-              ) : null}
-              {member.avoid_textures.length > 0 ? (
-                <div className="flex gap-2">
-                  <dt className="w-24 shrink-0 text-neutral-500">Avoid</dt>
-                  <dd>
-                    <ChipRow tags={member.avoid_textures} color="red" />
-                  </dd>
-                </div>
-              ) : null}
-              {member.structure_rules.length > 0 ? (
-                <div className="flex gap-2">
-                  <dt className="w-24 shrink-0 text-neutral-500">Serving</dt>
-                  <dd>
-                    <ChipRow tags={member.structure_rules} color="blue" />
-                  </dd>
-                </div>
-              ) : null}
-            </>
-          ) : null}
-        </dl>
+        ) : null}
+
+        <TasteDetails member={member} />
       </div>
     );
   }

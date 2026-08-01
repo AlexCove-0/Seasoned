@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import type { FlavorAxes } from "@/lib/flavor/axes";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentHousehold } from "@/lib/household";
 import { HouseholdNameEditor } from "./household-name-editor";
@@ -22,6 +23,7 @@ export type Member = {
   safe_foods: string[];
   avoid_textures: string[];
   structure_rules: string[];
+  flavor_axes: FlavorAxes | null;
 };
 
 export type ConnectedProfile = {
@@ -46,7 +48,7 @@ export default async function KitchenPage() {
   const { data: members } = await supabase
     .from("household_members")
     .select(
-      "id, user_id, display_name, taste_preferences, disliked_tastes, allergies, is_favorite, invite_token, flavor_archetype, quiz_taken_at, is_picky_eater, safe_foods, avoid_textures, structure_rules",
+      "id, user_id, display_name, taste_preferences, disliked_tastes, allergies, is_favorite, invite_token, flavor_archetype, quiz_taken_at, is_picky_eater, safe_foods, avoid_textures, structure_rules, flavor_axes",
     )
     .eq("household_id", household.id)
     .order("created_at", { ascending: true })
