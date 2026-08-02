@@ -59,11 +59,15 @@ export const CORE_QUIZ: QuizQuestion[] = [
     scene: "Calibration",
     prompt: "Where does the burn stop being fun and start being work?",
     options: [
+      // Weights track the Scoville scale's actual shape, which is violently
+      // non-linear: jalapeño ~5k SHU, serrano ~15k, habanero ~200k. Treating
+      // serrano -> habanero as one more step (+2 -> +3) badly understated a
+      // ~15x jump, so habanero now sits well clear of the rest.
       { id: "bell", label: "Bell pepper", detail: "No heat at all, thanks.", weights: { heat: -3 } },
       { id: "poblano", label: "Poblano", detail: "A whisper of warmth.", weights: { heat: -1 } },
       { id: "jalapeno", label: "Jalapeño", detail: "Pleasant, familiar heat.", weights: { heat: 1 } },
       { id: "serrano", label: "Serrano", detail: "Now we're talking.", weights: { heat: 2 } },
-      { id: "habanero", label: "Habanero", detail: "Bring it.", weights: { heat: 3, adventure: 1 } },
+      { id: "habanero", label: "Habanero", detail: "Bring it.", weights: { heat: 4, adventure: 1 } },
     ],
   },
   {
@@ -80,9 +84,10 @@ export const CORE_QUIZ: QuizQuestion[] = [
       {
         id: "broccoli",
         label: "Charred broccolini",
-        detail: "Blistered black at the edges, chili flake, lemon.",
-        // No heat weight: people pick this for the char, and crediting it as
-        // chili tolerance was scoring bitter-lovers as heat seekers.
+        // Chili flake removed from the description entirely. It was never
+        // scored, so it couldn't help -- it could only push chili-avoiders
+        // off an option that reads them correctly on char and acid.
+        detail: "Blistered black at the edges, a squeeze of lemon.",
         weights: { bitter: 2, acid: 1 },
       },
       {
@@ -259,15 +264,26 @@ export const CORE_QUIZ: QuizQuestion[] = [
       },
       {
         id: "avocado",
-        label: "Avocado and chili",
-        detail: "Lemon, flaky salt, a lot of chili flake.",
-        weights: { heat: 1, acid: 1 },
+        // Was "Avocado and chili ... a lot of chili flake", scored heat+acid
+        // together -- so liking lemon on toast required accepting heat. The
+        // heat now lives in its own option below, where it can be declined.
+        label: "Avocado and lemon",
+        detail: "Flaky salt, a hard squeeze of lemon.",
+        weights: { acid: 2 },
+      },
+      {
+        id: "chili_crisp",
+        label: "Chili crisp",
+        detail: "Spooned on thick, oil and all.",
+        weights: { heat: 2 },
       },
       {
         id: "marmite",
         label: "Something salty and funky",
         detail: "Marmite, anchovy butter, or aged cheese under the broiler.",
-        weights: { funk: 2, sweet_savory: -1 },
+        // Richness was implied by "butter"/"cheese" but unscored; an unscored
+        // cue can only mislead, so it's scored now.
+        weights: { funk: 2, sweet_savory: -1, richness: 1 },
       },
     ],
   },
@@ -330,9 +346,9 @@ export const CORE_QUIZ: QuizQuestion[] = [
       {
         id: "kimchi",
         label: "Fry it hard with kimchi",
-        detail: "A fried egg, a big spoon of gochujang.",
-        // Same reasoning as the broccolini: this is a funk choice, and
-        // kimchi's warmth is too mild to read as chili tolerance.
+        // Gochujang dropped from the description: it implied heat that was
+        // never scored, which is the one thing an option must never do.
+        detail: "A fried egg on top, edges crisped in the pan.",
         weights: { funk: 2, adventure: 1 },
       },
       {
@@ -424,7 +440,9 @@ export const CORE_QUIZ: QuizQuestion[] = [
       {
         id: "rich_dishes",
         label: "When it needs cutting",
-        detail: "Anything fatty, fried, or heavy gets it.",
+        // "fatty, fried, heavy" read as a richness signal that wasn't scored.
+        // Reworded so the option is purely about the acid habit.
+        detail: "Some dishes ask for it, some don't.",
         weights: { acid: 1 },
       },
       {
@@ -460,7 +478,9 @@ export const TIE_BREAKERS: QuizQuestion[] = [
       { id: "splash", label: "A splash of milk", detail: "Just to take the edge off.", weights: {} },
       {
         id: "sweet",
-        label: "Milk and sugar",
+        label: "Enough milk to hide it",
+        // Was "Milk and sugar", which leaked a sweet-tooth signal into a
+        // question that exists only to resolve bitterness.
         detail: "Or I'd rather have tea.",
         weights: { bitter: -3 },
       },

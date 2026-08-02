@@ -97,24 +97,25 @@ export function QuizFlow({
         </div>
       </div>
 
-      {/* The scene carries the setup the question depends on ("same roast
-          chicken, two finishes"), so it's set as a readable lead-in sentence
-          rather than a tracked-uppercase eyebrow -- styled as a label it
-          read as decoration and got skipped, leaving a question that made
-          no sense on its own. */}
-      <div className="flex flex-col gap-1.5">
+      {/* Everything here is sized up from where it started. The scene sets up
+          the question and the option details carry the actual substance, and
+          both were previously small, low-contrast text that people over 40
+          simply could not read on a phone. Body copy in this app is read at
+          arm's length in a kitchen -- it should be generous by default. */}
+      <div className="flex flex-col gap-2">
         {question.scene ? (
-          <p className="text-base text-neutral-600 dark:text-neutral-400">{question.scene}</p>
+          <p className="text-lg leading-snug text-neutral-700 text-balance dark:text-neutral-300">
+            {question.scene}
+          </p>
         ) : null}
         <h1 className="text-2xl leading-snug font-semibold tracking-tight text-balance">
           {question.prompt}
         </h1>
       </div>
 
-      {/* Extra breathing room here on purpose: the option cards are visually
-          heavy, and with a tight gap the eye jumps straight past the
-          question into them. */}
-      <div className="flex flex-col gap-2.5 pt-1">
+      {/* The rule separates question from answers: without it the eye slides
+          from the heading straight into the first card and skips the setup. */}
+      <div className="flex flex-col gap-2.5 border-t border-neutral-200 pt-5 dark:border-neutral-800">
         {question.options.map((option) => (
           <button
             key={option.id}
@@ -123,8 +124,10 @@ export function QuizFlow({
             onClick={() => choose(option.id)}
             className="rounded-xl bg-neutral-100 p-4 text-left transition-colors hover:bg-accent-50 disabled:opacity-50 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           >
-            <span className="block text-sm font-semibold">{option.label}</span>
-            <span className="mt-0.5 block text-sm text-neutral-500">{option.detail}</span>
+            <span className="block text-base font-semibold">{option.label}</span>
+            <span className="mt-1 block text-[15px] leading-snug text-neutral-600 dark:text-neutral-400">
+              {option.detail}
+            </span>
           </button>
         ))}
       </div>
